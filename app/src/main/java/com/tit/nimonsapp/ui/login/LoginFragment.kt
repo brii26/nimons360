@@ -6,10 +6,6 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -17,90 +13,58 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.tit.nimonsapp.R
+import com.tit.nimonsapp.databinding.FragmentLoginBinding
 import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
+	private var _binding: FragmentLoginBinding? = null
+	private val binding get() = _binding!!
+
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = inflater.inflate(R.layout.fragment_login, container, false)
+    ): View {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val emailInput: EditText = view.findViewById(R.id.email_input)
-        val passwordInput: EditText = view.findViewById(R.id.password_input)
-        val loginButton: Button = view.findViewById(R.id.login_button)
-        val errorText: TextView = view.findViewById(R.id.error_text)
-        val loadingIndicator: ProgressBar = view.findViewById(R.id.loading_indicator)
+        binding.emailInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.onEmailChanged(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
 
-        emailInput.addTextChangedListener(
-            object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) = Unit
+        binding.passwordInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.onPasswordChanged(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
 
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int,
-                ) {
-                    viewModel.onEmailChanged(s?.toString().orEmpty())
-                }
-
-                override fun afterTextChanged(s: Editable?) = Unit
-            },
-        )
-
-        passwordInput.addTextChangedListener(
-            object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) = Unit
-
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int,
-                ) {
-                    viewModel.onPasswordChanged(s?.toString().orEmpty())
-                }
-
-                override fun afterTextChanged(s: Editable?) = Unit
-            },
-        )
-
-        loginButton.setOnClickListener {
-            viewModel.login()
-        }
+        binding.loginButton.setOnClickListener { viewModel.login() }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    loadingIndicator.visibility =
+                    binding.loadingIndicator.visibility =
                         if (state.meta.isLoading) View.VISIBLE else View.GONE
 
-                    loginButton.isEnabled = !state.meta.isLoading
+                    binding.loginButton.isEnabled = !state.meta.isLoading
 
                     if (state.meta.errorMessage.isNullOrBlank()) {
-                        errorText.visibility = View.GONE
+                        binding.errorText.visibility = View.GONE
                     } else {
-                        errorText.visibility = View.VISIBLE
-                        errorText.text = state.meta.errorMessage
+                        binding.errorText.visibility = View.VISIBLE
+                        binding.errorText.text = state.meta.errorMessage
                     }
 
                     if (state.isLoggedIn) {
@@ -110,5 +74,10 @@ class LoginFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

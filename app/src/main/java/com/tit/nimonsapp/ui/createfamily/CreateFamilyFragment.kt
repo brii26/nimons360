@@ -5,12 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.tit.nimonsapp.R
+import com.tit.nimonsapp.databinding.FragmentCreateFamiliesBinding
 
 class CreateFamilyFragment : Fragment() {
+    private var _binding: FragmentCreateFamiliesBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = inflater.inflate(R.layout.fragment_create_families, container, false)
+    ): View {
+        _binding = FragmentCreateFamiliesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
