@@ -2,50 +2,55 @@
 <ScrollView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:context="com.tit.nimonsapp.ui.login.LoginFragment">
+	style="@style/ScrollViewDefault"
+>
 
-	<LinearLayout android:layout_width="match_parent"
-		android:layout_height="wrap_content" android:orientation="vertical"
-		android:padding="24dp">
+	<LinearLayout 
+		style="@style/Login.Container" >
 
-		<TextView android:id="@+id/login_title"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:text="Login"
-			android:textSize="28sp" android:textStyle="bold" />
+		<LinearLayout
+			style="@style/Login.Header" >
+			<include
+				android:id="@+id/app_logo"
+				layout="@layout/view_icon_container"
+				android:layout_width="120dp"
+				android:layout_height="120dp" />
 
-		<TextView android:id="@+id/login_subtitle"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="8dp"
-			android:text="Sign in to continue" android:textSize="16sp" />
+			<TextView android:id="@+id/login_title"
+				style="@style/Login.Title"
+				android:text="@string/login_title" />
+
+			<TextView android:id="@+id/login_subtitle"
+				style="@style/Login.Subtitle"
+				android:text="@string/login_subtitle" />
+		</LinearLayout>
 
 		<EditText android:id="@+id/email_input"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="24dp"
-			android:hint="Email" android:inputType="textEmailAddress" />
+			style="@style/Login.Input"
+			android:layout_marginTop="24dp"
+			android:hint="@string/login_email_placeholder"
+			android:inputType="textEmailAddress" />
 
 		<EditText android:id="@+id/password_input"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="12dp"
-			android:hint="Password" android:inputType="textPassword" />
+			style="@style/Login.Input"
+			android:layout_marginTop="12dp"
+			android:hint="@string/login_password_placeholder"
+			android:inputType="textPassword" />
 
 		<TextView android:id="@+id/error_text"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="12dp"
-			android:textColor="@android:color/holo_red_dark"
-			android:visibility="gone" tools:text="Invalid email or password"
+			style="@style/Login.ErrorText"
+			tools:text="Invalid email or password"
 			tools:visibility="visible" />
 
 		<ProgressBar android:id="@+id/loading_indicator"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginTop="16dp"
-			android:visibility="gone" tools:visibility="visible" />
+			style="@style/Login.LoadingIndicator"
+			tools:visibility="visible" />
 
-		<Button android:id="@+id/login_button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="16dp"
-			android:text="Login" />
+		<Button
+			android:id="@+id/login_button"
+			style="@style/Button.Login"
+			android:text="@string/login_button"
+		/>
 
 	</LinearLayout>
 </ScrollView>
