@@ -6,21 +6,23 @@
 	android:id="@+id/navigation_graphs"
 	app:startDestination="@id/startupFragment">
 
+	<!-- startup route -->
 	<fragment android:id="@+id/startupFragment"
 		android:name="com.tit.nimonsapp.ui.startup.StartupFragment"
 		android:label="startup">
 
 		<action
 			android:id="@+id/action_startupFragment_to_loginFragment"
-			app:destination="@id/loginFragment" app:popUpTo="@id/startupFragment"
+			app:destination="@id/loginFragment" app:popUpTo="@id/navigation_graphs"
 			app:popUpToInclusive="true" />
 
 		<action
 			android:id="@+id/action_startupFragment_to_homeFragment"
-			app:destination="@id/homeFragment" app:popUpTo="@id/startupFragment"
+			app:destination="@id/homeFragment" app:popUpTo="@id/navigation_graphs"
 			app:popUpToInclusive="true" />
 	</fragment>
 
+	<!-- login route -->
 	<fragment android:id="@+id/loginFragment"
 		android:name="com.tit.nimonsapp.ui.login.LoginFragment"
 		android:label="login" tools:layout="@layout/fragment_login">
@@ -30,6 +32,7 @@
 			app:popUpToInclusive="true" />
 	</fragment>
 
+	<!-- home route -->
 	<fragment android:id="@+id/homeFragment"
 		android:name="com.tit.nimonsapp.ui.home.HomeFragment"
 		android:label="home">
@@ -43,6 +46,7 @@
 			app:destination="@id/createFamilyFragment" />
 	</fragment>
 
+	<!-- families route -->
 	<fragment android:id="@+id/familiesFragment"
 		android:name="com.tit.nimonsapp.ui.families.FamiliesFragment"
 		android:label="families" tools:layout="@layout/fragment_families">
@@ -56,10 +60,12 @@
 			app:destination="@id/createFamilyFragment" />
 	</fragment>
 
+	<!-- map route -->
 	<fragment android:id="@+id/mapFragment"
 		android:name="com.tit.nimonsapp.ui.map.MapFragment"
 		android:label="map" />
 
+	<!-- family detail route -->
 	<fragment android:id="@+id/familyDetailFragment"
 		android:name="com.tit.nimonsapp.ui.familydetail.FamilyDetailFragment"
 		android:label="family_detail">
@@ -72,6 +78,7 @@
 			app:destination="@id/familiesFragment" />
 	</fragment>
 
+	<!-- profile route -->
 	<fragment android:id="@+id/profileFragment"
 		android:name="com.tit.nimonsapp.ui.profile.ProfileFragment"
 		android:label="profile" tools:layout="@layout/fragment_profile">
@@ -82,10 +89,11 @@
 
 		<action
 			android:id="@+id/action_profileFragment_to_loginFragment"
-			app:destination="@id/loginFragment" app:popUpTo="@id/loginFragment"
+			app:destination="@id/loginFragment" app:popUpTo="@id/navigation_graphs"
 			app:popUpToInclusive="true" />
 	</fragment>
 
+	<!-- create family route -->
 	<fragment android:id="@+id/createFamilyFragment"
 		android:name="com.tit.nimonsapp.ui.createfamily.CreateFamilyFragment"
 		android:label="create_family"
