@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.databinding.FragmentLoginBinding
 import kotlinx.coroutines.launch
+import android.text.InputType
 
 class LoginFragment : Fragment() {
 	private var _binding: FragmentLoginBinding? = null
@@ -52,28 +53,64 @@ class LoginFragment : Fragment() {
 
         binding.loginButton.setOnClickListener { viewModel.login() }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.loadingIndicator.visibility =
-                        if (state.meta.isLoading) View.VISIBLE else View.GONE
+		//toggle password visibility
+		var isPasswordVisible = false
+		binding.passwordInput.setOnRightActionClick {
+			isPasswordVisible = !isPasswordVisible
 
-                    binding.loginButton.isEnabled = !state.meta.isLoading
+			val inputType = if (isPasswordVisible) {
+				InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+			} else {
+				InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+			}
+			binding.passwordInput.setInputType(inputType)
+			if (isPasswordVisible) {
+				binding.passwordInput.setRightActionText("Hide")
+				binding.passwordInput.setRightActionIcon(R.drawable.ic_hide)
+			} else {
+				binding.passwordInput.setRightActionText("Show")
+				binding.passwordInput.setRightActionIcon(R.drawable.ic_show)
+			}
+		}
 
-                    if (state.meta.errorMessage.isNullOrBlank()) {
-                        binding.errorText.visibility = View.GONE
-                    } else {
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = state.meta.errorMessage
-                    }
+		viewLifecycleOwner.lifecycleScope.launch {
+			viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+				viewModel.uiState.collect { state ->
+					binding.loadingIndicator.visibility = if (state.meta.isLoading) View.VISIBLE else View.GONE
+					binding.loginButton.isEnabled = !state.meta.isLoading
 
-                    if (state.isLoggedIn) {
-                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                        viewModel.consumeLoginSuccess()
-                    }
-                }
-            }
-        }
+					val errorMessage = state.meta.errorMessage
+					if (errorMessage.isNullOrBlank()) {
+						binding.emailInput.setError(null)
+						binding.passwordInput.setError(null)
+					} else {
+						val error = errorMessage.lowercase()
+						when {
+							error.contains("empty") -> {
+								binding.emailInput.setError("Required")
+								binding.passwordInput.setError("Required")
+							}
+							error.contains("email") || error.contains("user") -> {
+								binding.emailInput.setError(errorMessage)
+								binding.passwordInput.setError(null)
+							}
+							error.contains("password") -> {
+								binding.passwordInput.setError(errorMessage)
+								binding.emailInput.setError(null)
+							}
+							else -> {
+								binding.emailInput.setError(errorMessage)
+							}
+						}
+					}
+
+					if (state.isLoggedIn) {
+						findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+						viewModel.consumeLoginSuccess()
+					}
+				}
+			}
+		}
     }
 
     override fun onDestroyView() {

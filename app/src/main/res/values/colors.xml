@@ -13,6 +13,8 @@
 	<color name="black">#000000</color>
 
 	<!-- Specific -->
+	<color name="input_focused">#2f5eeb</color>
+	<color name="input_error">#B91C1C</color>
 	<color name="error">#B00020</color>
 	<color name="icon_container_background">#FFBB86FC</color>
 </resources>
