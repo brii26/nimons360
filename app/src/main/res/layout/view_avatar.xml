@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    jangan di-include langsung, pake AvatarView custom view:
+    <com.tit.nimonsapp.ui.common.AvatarView android:id="@+id/avatar"
+        android:layout_width="40dp" android:layout_height="40dp"
+        app:avatarShape="circle" app:avatarText="A"/>
+    set gambar dari code: avatar.setImage { Coil.load(it, url) }
+-->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/iv_avatar_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tv_avatar_letter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnPrimary"/>
+
+</merge>
