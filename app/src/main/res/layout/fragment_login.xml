@@ -53,10 +53,6 @@
 		<com.tit.nimonsapp.ui.common.ButtonPrimaryView
 			android:id="@+id/login_button"
 			style="@style/Button.Primary.Login"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:paddingVertical="10dp"
 			android:text="@string/login_button" />
 
 	</LinearLayout>

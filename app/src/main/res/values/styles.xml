@@ -13,9 +13,7 @@
 	<style name="Button.Primary">
 		<item name="android:layout_width">wrap_content</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="cornerRadius">12dp</item>
-		<item name="buttonColor">@color/primary</item>
-		<item name="buttonTextColor">@color/white</item>
+		<item name="cornerRadius">17dp</item>
 	</style>
 
 	<!-- Input Field -->
@@ -27,7 +25,7 @@
 	<style name="StyleContent">
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="android:layout_marginStart">12dp</item>
+		<item name="android:layout_marginStart">20dp</item>
 	</style>
 
 	<style name="StyleRightAction">
@@ -96,7 +94,8 @@
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:layout_marginTop">16dp</item>
-		<item name="android:paddingVertical">10dp</item>
+		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
 	</style>
 
 </resources>

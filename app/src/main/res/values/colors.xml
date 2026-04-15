@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!-- general -->
-	<!-- ini ubah aja cok klo mau, gw cuma mo nyobanyoba primary color -->
-	<color name="primary">#3ab02c</color> 
 
 	<!-- Literal -->
 	<color name="red">#F44336</color>
