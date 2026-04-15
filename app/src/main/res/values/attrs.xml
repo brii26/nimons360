@@ -1,0 +1,14 @@
+<resources>
+
+    <declare-styleable name="InputField">
+        <attr name="leftIcon" format="reference" />
+        <attr name="placeholderText" format="string" />
+        <attr name="rightActionText" format="string" />
+    </declare-styleable>
+
+	<declare-styleable name="ButtonPrimary">
+        <attr name="buttonColor" format="color|reference" />
+        <attr name="buttonTextColor" format="color|reference" />
+    </declare-styleable>
+
+</resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	style="@style/ScrollViewDefault"
 >
@@ -10,11 +11,11 @@
 
 		<LinearLayout
 			style="@style/Login.Header" >
-			<include
+			<ImageView
 				android:id="@+id/app_logo"
-				layout="@layout/view_icon_container"
-				android:layout_width="120dp"
-				android:layout_height="120dp" />
+				android:src="@drawable/ic_app_border"
+				android:layout_width="128dp"
+				android:layout_height="128dp"/>
 
 			<TextView android:id="@+id/login_title"
 				style="@style/Login.Title"
@@ -25,17 +26,20 @@
 				android:text="@string/login_subtitle" />
 		</LinearLayout>
 
-		<EditText android:id="@+id/email_input"
+		<com.tit.nimonsapp.ui.common.InputFieldView
+			android:id="@+id/email_input"
 			style="@style/Login.Input"
 			android:layout_marginTop="24dp"
-			android:hint="@string/login_email_placeholder"
-			android:inputType="textEmailAddress" />
+			app:leftIcon="@drawable/ic_mail"
+			app:placeholderText="@string/login_email_placeholder" />
 
-		<EditText android:id="@+id/password_input"
+		<com.tit.nimonsapp.ui.common.InputFieldView
+			android:id="@+id/password_input"
 			style="@style/Login.Input"
 			android:layout_marginTop="12dp"
-			android:hint="@string/login_password_placeholder"
-			android:inputType="textPassword" />
+			app:leftIcon="@drawable/ic_lock"
+			app:placeholderText="@string/login_password_placeholder"
+			app:rightActionText="Show" />
 
 		<TextView android:id="@+id/error_text"
 			style="@style/Login.ErrorText"
@@ -46,11 +50,14 @@
 			style="@style/Login.LoadingIndicator"
 			tools:visibility="visible" />
 
-		<Button
+		<com.tit.nimonsapp.ui.common.ButtonPrimaryView
 			android:id="@+id/login_button"
-			style="@style/Button.Login"
-			android:text="@string/login_button"
-		/>
+			style="@style/Button.Primary.Login"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:paddingVertical="10dp"
+			android:text="@string/login_button" />
 
 	</LinearLayout>
 </ScrollView>

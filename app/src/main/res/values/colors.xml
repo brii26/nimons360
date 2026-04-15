@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!-- general -->
+	<!-- ini ubah aja cok klo mau, gw cuma mo nyobanyoba primary color -->
+	<color name="primary">#3ab02c</color> 
+
+	<!-- Literal -->
 	<color name="red">#F44336</color>
 	<color name="green">#4CAF50</color>
 	<color name="yellow">#FFC107</color>
@@ -10,6 +14,7 @@
 	<color name="white">#FFFFFF</color>
 	<color name="black">#000000</color>
 
+	<!-- Specific -->
 	<color name="error">#B00020</color>
 	<color name="icon_container_background">#FFBB86FC</color>
 </resources>
