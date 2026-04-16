@@ -26,6 +26,7 @@ import com.google.android.gms.location.Priority
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class DeviceLocation(
     val latitude: Double = 0.0,
@@ -52,13 +53,16 @@ class LocationRepository(private val context: Context) {
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             result.locations.lastOrNull()?.let { location ->
-                val newLocation = _currentLocation.value.copy(
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    internetStatus = getInternetStatus()
-                )
+                _currentLocation.update {
+                    it.copy(
+                        latitude = location.latitude,
+                        longitude = location.longitude,
+                        internetStatus = getInternetStatus()
+                    )
+                }
                 // printing logcat
-                Log.d("NIMONS_GPS", "Lat: ${newLocation.latitude}, Lon: ${newLocation.longitude}, Rot: ${newLocation.rotation}")
+                val current = _currentLocation.value
+                Log.d("NIMONS_GPS", "Lat: ${current.latitude}, Lon: ${current.longitude}, Rot: ${current.rotation}")
             }
         }
     }
@@ -91,10 +95,12 @@ class LocationRepository(private val context: Context) {
                 val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
                 val isCharging = plugged != 0 && (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL)
 
-                _currentLocation.value = _currentLocation.value.copy(
-                    batteryLevel = level,
-                    isCharging = isCharging
-                )
+                _currentLocation.update {
+                    it.copy(
+                        batteryLevel = level,
+                        isCharging = isCharging
+                    )
+                }
             }
         }
         context.registerReceiver(batteryReceiver, batteryIntentFilter)
@@ -126,7 +132,7 @@ class LocationRepository(private val context: Context) {
             var azimuth = Math.toDegrees(orientationAngles[0].toDouble()).toFloat()
             if (azimuth < 0f) azimuth += 360f
 
-            _currentLocation.value = _currentLocation.value.copy(rotation = azimuth.toDouble())
+            _currentLocation.update { it.copy(rotation = azimuth.toDouble()) }
         }
     }
 

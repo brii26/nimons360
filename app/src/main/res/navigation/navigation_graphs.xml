@@ -5,6 +5,8 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/navigation_graphs"
 	app:startDestination="@id/startupFragment">
+	<!-- ini buat testing GPS doang -->
+	<!--app:startDestination="@id/locationTestFragment">-->
 
 	<!-- startup route -->
 	<fragment android:id="@+id/startupFragment"
@@ -107,5 +109,11 @@
 			android:id="@+id/action_createFamilyFragment_to_familiesFragment"
 			app:destination="@id/familiesFragment" />
 	</fragment>
+
+	<!-- location test route -->
+	<fragment android:id="@+id/locationTestFragment"
+		android:name="com.tit.nimonsapp.ui.LocationTestFragment"
+		android:label="location_test"
+		tools:layout="@layout/fragment_location_test" />
 
 </navigation>
