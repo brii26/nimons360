@@ -2,6 +2,7 @@ package com.tit.nimonsapp.data.network
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 data class OnlineUser(val id: Int, val location: UserLocation)
 
