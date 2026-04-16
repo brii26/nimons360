@@ -1,66 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:context="com.tit.nimonsapp.ui.families.FamiliesFragment">
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context="com.tit.nimonsapp.ui.families.FamiliesFragment">
 
-	<LinearLayout android:layout_width="match_parent"
-		android:layout_height="wrap_content" android:orientation="vertical"
-		android:padding="24dp">
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:elevation="0dp">
 
-		<TextView android:id="@+id/families_title"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:text="Families"
-			android:textSize="28sp" android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
+            android:background="@color/white"
+            android:paddingBottom="8dp">
 
-		<ProgressBar android:id="@+id/loading_indicator"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" android:layout_marginTop="16dp"
-			android:visibility="gone" tools:visibility="visible" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Families"
+                android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
-		<TextView android:id="@+id/error_text"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="12dp"
-			android:textColor="@android:color/holo_red_dark"
-			android:visibility="gone" tools:text="Failed to load families"
-			tools:visibility="visible" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/search_layout"
+                style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:boxBackgroundColor="@color/search_bar_bg"
+                app:boxCollapsedPaddingTop="0dp"
+                app:boxCornerRadiusBottomEnd="24dp"
+                app:boxCornerRadiusBottomStart="24dp"
+                app:boxCornerRadiusTopEnd="24dp"
+                app:boxCornerRadiusTopStart="24dp"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp"
+                app:hintEnabled="false"
+                app:startIconDrawable="@drawable/ic_search"
+                app:startIconTint="@color/section_label">
 
-		<Button android:id="@+id/go_create_family_button"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="12dp"
-			android:text="Create Family" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/search_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search families..."
+                    android:inputType="text"
+                    android:paddingVertical="12dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/section_label" />
 
-		<TextView android:id="@+id/pinned_families_label"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="24dp"
-			android:text="Pinned Families" android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-		<LinearLayout android:id="@+id/pinned_families_container"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:orientation="vertical"
-			android:layout_marginTop="8dp" />
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/filter_chip_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
 
-		<TextView android:id="@+id/my_families_label"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="24dp"
-			android:text="My Families" android:textStyle="bold" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="All"
+                    app:chipBackgroundColor="@color/primary_blue"
+                    app:chipStrokeWidth="0dp"
+                    android:textColor="@color/white" />
 
-		<LinearLayout android:id="@+id/my_families_container"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:orientation="vertical"
-			android:layout_marginTop="8dp" />
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_my_families"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="My Families"
+                    app:chipBackgroundColor="@color/white"
+                    app:chipStrokeColor="@color/chip_unselected_stroke"
+                    app:chipStrokeWidth="1dp"
+                    android:textColor="@color/black" />
 
-		<TextView android:id="@+id/all_families_label"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="24dp"
-			android:text="All Families" android:textStyle="bold" />
+            </com.google.android.material.chip.ChipGroup>
 
-		<LinearLayout android:id="@+id/all_families_container"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content" android:orientation="vertical"
-			android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
-	</LinearLayout>
-</ScrollView>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="80dp">
+
+            <TextView
+                android:id="@+id/pinned_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="4dp"
+                android:text="PINNED"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="@color/section_label"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinned_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_family" />
+
+            <TextView
+                android:id="@+id/all_families_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="4dp"
+                android:text="ALL FAMILIES"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                android:textColor="@color/section_label"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/all_families_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="5"
+                tools:listitem="@layout/item_family" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_family"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:contentDescription="Add Family"
+        app:backgroundTint="@color/fab_bg"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@color/primary_blue" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
