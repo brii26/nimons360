@@ -23,8 +23,6 @@ coroutinesAndroid = "1.8.1"
 okhttp = "5.3.0"
 composeCompilerPlugin = "2.2.0"
 legacySupport = "28.0.0"
-navigationFragmentKtx = "2.9.7"
-navigationUiKtx = "2.9.7"
 playServicesLocation = "21.3.0"
 
 [libraries]
@@ -60,8 +58,6 @@ jetbrains-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name =
 squareup-okhttp3-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 squareup-okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 maplibre-android-sdk = { group = "org.maplibre.gl", name = "android-sdk", version.ref = "maplibre" }
-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 
