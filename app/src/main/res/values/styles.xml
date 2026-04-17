@@ -10,11 +10,32 @@
 		<item name="android:fillViewport">true</item>
 	</style>
 
-	<style name="Button.Primary">
-		<item name="android:layout_width">wrap_content</item>
+	<style name="Button.Filled">
+		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="cornerRadius">17dp</item>
 		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
+	</style>
+
+	<style name="Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="cornerRadius">17dp</item>
+		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
+		<item name="strokeColor">?attr/colorPrimary</item>
+		<item name="android:textColor">?attr/colorPrimary</item>
+	</style>
+
+	<style name="Button.Destructive" parent="Widget.MaterialComponents.Button.OutlinedButton">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="cornerRadius">17dp</item>
+		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
+		<item name="strokeColor">@color/error</item>
+		<item name="android:textColor">@color/error</item>
 	</style>
 
 	<!-- Input Field -->
@@ -92,11 +113,5 @@
 		<item name="android:textColor">?attr/colorOnSurfaceVariant</item>
 	</style>
 
-	<style name="Button.Primary.Login">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">wrap_content</item>
-		<item name="android:textAllCaps">false</item>
-		<item name="android:paddingVertical">13dp</item>
-	</style>
 
 </resources>

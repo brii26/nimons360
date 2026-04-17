@@ -50,9 +50,9 @@
 			style="@style/Login.LoadingIndicator"
 			tools:visibility="visible" />
 
-		<com.tit.nimonsapp.ui.common.ButtonPrimaryView
+		<com.tit.nimonsapp.ui.common.ButtonView
 			android:id="@+id/login_button"
-			style="@style/Button.Primary.Login"
+			style="@style/Button.Filled"
 			android:text="@string/login_button" />
 
 	</LinearLayout>
