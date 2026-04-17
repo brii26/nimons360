@@ -17,16 +17,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import com.tit.nimonsapp.MainActivity
 import com.tit.nimonsapp.R
-import com.tit.nimonsapp.data.network.WebSocketManager
-import com.tit.nimonsapp.data.network.WebSocketRepository
 import com.tit.nimonsapp.data.repository.DeviceLocation
 import com.tit.nimonsapp.data.repository.LocationRepository
 import com.tit.nimonsapp.ui.common.UserInfoBottomSheet
 import com.tit.nimonsapp.ui.map.components.MapMarkerView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -36,7 +34,6 @@ import org.maplibre.android.maps.OnMapReadyCallback
 import org.maplibre.android.maps.Style
 import org.maplibre.android.plugins.markerview.MarkerView
 import org.maplibre.android.plugins.markerview.MarkerViewManager
-import java.util.concurrent.TimeUnit
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -45,12 +42,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var markerViewManager: MarkerViewManager
 
     private lateinit var locationRepository: LocationRepository
-    private lateinit var webSocketRepository: WebSocketRepository
     private lateinit var viewModel: MapViewModel
 
     private val markers = mutableMapOf<Int, MarkerView>() // userId -> Marker
     private var currentUserMarker: MarkerView? = null
-
     private var currentUserMarkerView: MapMarkerView? = null
 
     private var userInfoBottomSheet: UserInfoBottomSheet? = null
@@ -61,9 +56,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ) { permissions ->
         val fineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
         if (fineLocation) {
-            startLocationUpdatesAndConnect()
+            viewModel.setGpsPermissionGranted(true)
+            startLocationUpdates()
         } else {
-            showSnackbar("Location permission required for map feature")
+            viewModel.setGpsPermissionGranted(false)
+            showSnackbar("Location permission required - enable to share your position")
         }
     }
 
@@ -75,7 +72,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         MapLibre.getInstance(requireContext())
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        // Fix typo findViewByld -> findViewById and add type hint
         mapSearchEditText = view.findViewById<EditText>(R.id.et_search) 
             ?: view.findViewById<View>(R.id.map_search_bar)?.findViewById<EditText>(R.id.et_search) 
             ?: EditText(requireContext())
@@ -95,24 +91,24 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         return view
     }
 
+    // Initialize location tracking and observe WebSocket messages
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         locationRepository = LocationRepository(requireContext())
         locationRepository.initialize()
 
-        val client = OkHttpClient.Builder()
-            .pingInterval(30, TimeUnit.SECONDS)
-            .build()
-
-        val webSocketManager = WebSocketManager(client)
-        webSocketRepository = WebSocketRepository(webSocketManager)
-
-        val factory = MapViewModelFactory(requireActivity().application, webSocketRepository)
+        // Use the shared WebSocketRepository from MainActivity
+        val factory = MapViewModelFactory(requireActivity().application, MainActivity.webSocketRepository)
         viewModel = ViewModelProvider(this, factory)[MapViewModel::class.java]
 
         observeViewModel()
         setupSearchBar()
+
+        // Load user profile and family members for filtering
+        viewModel.loadCurrentUserProfile()
+        viewModel.loadFamilyMembers()
+
         requestLocationPermission()
     }
 
@@ -134,7 +130,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            startLocationUpdatesAndConnect()
+            startLocationUpdates()
         } else {
             requestPermissionLauncher.launch(
                 arrayOf(
@@ -146,7 +142,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     @SuppressLint("MissingPermission")
-    private fun startLocationUpdatesAndConnect() {
+    private fun startLocationUpdates() {
         locationRepository.startLocationUpdates()
 
         lifecycleScope.launch {
@@ -165,7 +161,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        viewModel.connectWebSocket()
+        // Start observing WebSocket messages in the ViewModel
+        viewModel.startObservingWebSocket()
 
         lifecycleScope.launch {
             while (true) {
@@ -179,20 +176,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (!::mapLibreMap.isInitialized) return
 
         val position = LatLng(location.latitude, location.longitude)
+        val profile = viewModel.uiState.value.currentUserProfile
+        val initial = profile?.fullName?.take(1)?.uppercase() ?: "M"
 
         if (currentUserMarker == null) {
             currentUserMarkerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.CURRENT_USER).apply {
-                setMarkerData("M")
+                setMarkerData(initial)
                 setMarkerRotation(location.rotation.toFloat())
-                isClickable = true
-                isFocusable = true
             }
 
             currentUserMarker = MarkerView(position, currentUserMarkerView!!).apply {
                 markerViewManager.addMarker(this)
             }
 
-            // Click listener for current user marker
             currentUserMarkerView?.setOnClickListener {
                 showMyInfoBottomSheet()
             }
@@ -201,6 +197,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         } else {
             currentUserMarker?.setLatLng(position)
             currentUserMarkerView?.setMarkerRotation(location.rotation.toFloat())
+            currentUserMarkerView?.setMarkerData(initial)
         }
     }
 
@@ -241,6 +238,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val currentIds = markers.keys.toList()
         val newIds = users.keys
+        val myId = viewModel.uiState.value.currentUserProfile?.id
 
         currentIds.forEach { userId ->
             if (userId !in newIds) {
@@ -250,6 +248,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         users.forEach { (userId, user) ->
+            if (userId == myId) return@forEach // Skip if it's current user (already handled)
+
             val position = LatLng(user.latitude, user.longitude)
 
             if (userId in markers) {
@@ -260,8 +260,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         user.fullName.take(1).uppercase(),
                         ContextCompat.getColor(requireContext(), R.color.blue),
                     )
-                    isClickable = true
-                    isFocusable = true
                 }
 
                 val marker = MarkerView(position, markerView).apply {
@@ -289,12 +287,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    // Show current user's info in bottom sheet (clicked on own marker)
     private fun showMyInfoBottomSheet() {
         dismissUserInfoBottomSheet()
 
         val currentUser = viewModel.uiState.value.currentLocation
+        // Get current location and profile (loaded from /api/me)
         val profile = viewModel.uiState.value.currentUserProfile
-
         val myUserOnMap = UserOnMap(
             userId = profile?.id ?: 0,
             fullName = profile?.fullName ?: "Me",
@@ -307,6 +306,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             internetStatus = currentUser.internetStatus,
             lastUpdateTimestamp = System.currentTimeMillis(),
         )
+        userInfoBottomSheet = UserInfoBottomSheet(requireContext()).apply {
+            setUser(myUserOnMap)
+            setOnDismissListener {
+                userInfoBottomSheet = null
+            }
+            show()
+        }
 
         userInfoBottomSheet = UserInfoBottomSheet(requireContext()).apply {
             setUser(myUserOnMap)
@@ -360,7 +366,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.disconnectWebSocket()
+        // We don't disconnect WebSocket here anymore, it's global
         locationRepository.stopLocationUpdates()
         dismissUserInfoBottomSheet()
         mapView.onDestroy()

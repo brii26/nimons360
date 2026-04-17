@@ -24,7 +24,19 @@ class MapViewModel(
     private val authRepository = AuthRepository()
     private val familyRepository = FamilyRepository()
 
+    // Track GPS permission state - only send location updates when granted
+    private var hasGpsPermission = false
     private var isLocationSending = false
+
+     // Load current user profile for "My Info" and to get user ID for filtering.
+     // Set GPS permission status from Fragment.
+     // Dipanggil stlh permission granted to start location updates.
+    fun setGpsPermissionGranted(granted: Boolean) {
+        hasGpsPermission = granted
+        if (granted && !isLocationSending) {
+            startLocationUpdates()
+        }
+    }
 
     /**
      * Load current user profile for "My Info" and to get user ID for filtering.
@@ -105,13 +117,17 @@ class MapViewModel(
 
     /**
      * Periodically send my location to the server via WebSocket.
+     * Only sends updates when GPS permission is granted.
      */
     private fun startLocationUpdates() {
         if (isLocationSending) return
+        if (!hasGpsPermission) return  // Skip if permission denied
         isLocationSending = true
 
         viewModelScope.launch {
             while (isLocationSending) {
+                // Send location every 1 second until stopped or permission revoked
+                delay(1000)
                 val state = uiState.value
                 val location = state.currentLocation
                 val userName = state.currentUserProfile?.fullName ?: "Me"
@@ -133,9 +149,8 @@ class MapViewModel(
         }
     }
 
-    /**
-     * Process incoming presence data. Filter by family members.
-     */
+
+    // Process incoming presence data. Filter by family members.
     private fun handleMemberPresenceUpdated(payload: JSONObject?) {
         payload ?: return
 

@@ -19,7 +19,7 @@ class MapMarkerView @JvmOverloads constructor(
     private val markerType: MarkerType = MarkerType.OTHER_USER,
 ) : FrameLayout(context) {
 
-    private val avatarView: AvatarView
+    private val avatarView: AvatarView?
     private var letter = ""
     private var avatarColor = 0
 
@@ -38,14 +38,17 @@ class MapMarkerView @JvmOverloads constructor(
 
         avatarView = findViewById(R.id.marker_avatar)
 
-        // Set initial size marker
+        // Set container size yang cukup besar agar panah tidak kepotong
         val size = when (markerType) {
-            MarkerType.CURRENT_USER -> 56f.dpToPx(context).toInt()
-            MarkerType.OTHER_USER -> 44f.dpToPx(context).toInt()
+            MarkerType.CURRENT_USER -> 80f.dpToPx(context).toInt()
+            MarkerType.OTHER_USER -> 48f.dpToPx(context).toInt()
         }
         layoutParams = LayoutParams(size, size)
         
-        // Penting: Pastikan view bisa diklik agar onClickListener jalan
+        // Pastikan tidak ada clipping di level parent
+        clipChildren = false
+        clipToPadding = false
+        
         isClickable = true
         isFocusable = true
     }
@@ -56,7 +59,7 @@ class MapMarkerView @JvmOverloads constructor(
     ) {
         this.letter = letter.take(1).uppercase()
         this.avatarColor = color
-        avatarView.setLetter(this.letter, this.avatarColor)
+        avatarView?.setLetter(this.letter, this.avatarColor)
     }
 
     fun setMarkerRotation(rotation: Float) {
