@@ -1,8 +1,15 @@
 package com.tit.nimonsapp.data.network
 
+import android.content.Context
+import android.content.Intent
+import com.tit.nimonsapp.MainActivity
+import com.tit.nimonsapp.data.repository.SessionRepository
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -72,8 +79,35 @@ interface FamilyApi {
     ): ApiResponse<LeaveFamilyResponseDto>
 }
 
+class AuthInterceptor(private val context: Context) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        val response = chain.proceed(request)
+
+        // Session expired (409) or Unauthorized (401)
+        if (response.code == 409 || response.code == 401) {
+            val sessionRepository = SessionRepository(context)
+            runBlocking {
+                sessionRepository.clearToken()
+            }
+            
+            // Redirect to MainActivity which should handle the login routing if no token
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            context.startActivity(intent)
+        }
+        return response
+    }
+}
+
 object Api {
     private const val BASE_URL = "https://mad.labpro.hmif.dev/"
+    private var appContext: Context? = null
+
+    fun initialize(context: Context) {
+        appContext = context.applicationContext
+    }
 
     private val json =
         Json {
@@ -86,21 +120,26 @@ object Api {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-    private val okHttpClient =
-        OkHttpClient
-            .Builder()
+    private val okHttpClient by lazy {
+        val builder = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .build()
+        
+        appContext?.let {
+            builder.addInterceptor(AuthInterceptor(it))
+        }
+        
+        builder.build()
+    }
 
-    private val retrofit =
-        Retrofit
-            .Builder()
+    private val retrofit by lazy {
+        Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(
                 json.asConverterFactory("application/json".toMediaType()),
             ).build()
+    }
 
-    val auth: AuthApi = retrofit.create(AuthApi::class.java)
-    val family: FamilyApi = retrofit.create(FamilyApi::class.java)
+    val auth: AuthApi by lazy { retrofit.create(AuthApi::class.java) }
+    val family: FamilyApi by lazy { retrofit.create(FamilyApi::class.java) }
 }
