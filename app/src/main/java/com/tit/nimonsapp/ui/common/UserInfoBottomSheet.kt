@@ -17,6 +17,7 @@ class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
     private val tvUserName: TextView
     private val tvUserEmail: TextView
     private val tvBatteryValue: TextView
+    private val ivCharging: ImageView
     private val tvLocationValue: TextView
     private val tvWifiValue: TextView
     private val ivWifiIcon: ImageView
@@ -29,6 +30,7 @@ class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
         tvUserName = view.findViewById(R.id.tvUserName)
         tvUserEmail = view.findViewById(R.id.tvUserEmail)
         tvBatteryValue = view.findViewById(R.id.tvBatteryValue)
+        ivCharging = view.findViewById(R.id.ivCharging)
         tvLocationValue = view.findViewById(R.id.tvLocationValue)
         tvWifiValue = view.findViewById(R.id.tvWifiValue)
         ivWifiIcon = view.findViewById(R.id.ivWifiIcon)
@@ -50,6 +52,9 @@ class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
 
         // Set battery
         tvBatteryValue.text = "${user.batteryLevel}%"
+
+        // Set charging icon
+        ivCharging.visibility = if (user.isCharging) View.VISIBLE else View.GONE
 
         // Set location
         tvLocationValue.text = String.format("%.3f, %.3f", user.latitude, user.longitude)

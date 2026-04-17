@@ -82,15 +82,31 @@
                 app:tint="#4CAF50"
                 android:contentDescription="@null" />
 
-            <TextView
-                android:id="@+id/tvBatteryValue"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:layout_marginTop="4dp"
-                tools:text="82%" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/tvBatteryValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    tools:text="82%" />
+
+                <ImageView
+                    android:id="@+id/ivCharging"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_charging"
+                    android:visibility="gone"
+                    android:contentDescription="@null" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
