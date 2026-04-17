@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -47,16 +48,12 @@ class FamiliesFragment : Fragment() {
     private fun setupAdapters() {
         pinnedAdapter = FamiliesAdapter(
             onPinClick = { id -> viewModel.togglePinned(id) },
-            onItemClick = { id -> 
-                // Navigate to detail if needed
-            }
+            onItemClick = { id -> navigateToDetail(id) }
         )
         
         allFamiliesAdapter = FamiliesAdapter(
             onPinClick = { id -> viewModel.togglePinned(id) },
-            onItemClick = { id ->
-                // Navigate to detail if needed
-            }
+            onItemClick = { id -> navigateToDetail(id) }
         )
 
         binding.pinnedRecycler.apply {
@@ -70,12 +67,17 @@ class FamiliesFragment : Fragment() {
         }
     }
 
+    private fun navigateToDetail(familyId: Int) {
+        val bundle = bundleOf("familyId" to familyId)
+        findNavController().navigate(R.id.action_familiesFragment_to_familyDetailFragment, bundle)
+    }
+
     private fun setupListeners() {
         binding.searchInput.addTextChangedListener { text ->
             viewModel.updateSearchQuery(text?.toString() ?: "")
         }
 
-        binding.filterChipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+        binding.filterChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
             val filter = when (checkedIds.firstOrNull()) {
                 R.id.chip_my_families -> FamiliesFilter.MY_FAMILIES
                 else -> FamiliesFilter.ALL
