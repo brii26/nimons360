@@ -6,6 +6,8 @@
         <attr name="rightActionText" format="string" />
 		<attr name="rightActionIcon" format="reference" />
 		<attr name="android:inputType"/>
+        <attr name="labelText" format="string" />
+        <attr name="clearable" format="boolean" />
     </declare-styleable>
 
 

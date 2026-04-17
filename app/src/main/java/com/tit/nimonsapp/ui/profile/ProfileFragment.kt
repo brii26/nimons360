@@ -32,11 +32,33 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.logoutButton.setOnClickListener { viewModel.logout() }
+        viewModel.loadProfile()
+
+        binding.editAvatarButton.setOnClickListener {
+            EditNameBottomSheetFragment().show(childFragmentManager, null)
+        }
+
+        binding.backHomeButton.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_homeFragment)
+        }
+
+        binding.logoutButton.setOnClickListener {
+            SignOutModalFragment(onConfirm = { viewModel.logout() })
+                .show(childFragmentManager, null)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
+                    state.profile?.let { profile ->
+                        binding.profileName.text = profile.fullName
+                        binding.profileEmail.text = profile.email
+                        binding.profileAvatar.setLetter(
+                            profile.fullName.firstOrNull()?.toString() ?: "?",
+                            requireContext().getColor(android.R.color.black),
+                        )
+                    }
+
                     if (state.isLoggedOut) {
                         viewModel.consumeLogout()
                         findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
