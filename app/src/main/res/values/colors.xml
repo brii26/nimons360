@@ -13,6 +13,7 @@
 	<color name="black">#000000</color>
 
 	<!-- Specific -->
+	<color name="colorPrimary">#3ab02c</color>
 	<color name="error">#B00020</color>
 	<color name="icon_container_background">#FFBB86FC</color>
 </resources>

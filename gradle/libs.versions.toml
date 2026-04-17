@@ -2,6 +2,7 @@
 agp = "8.5.2"
 kotlin = "2.2.0"
 maplibre = "13.0.2"
+maplibre-plugin = "3.0.2"
 coreKtx = "1.12.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -58,6 +59,7 @@ jetbrains-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name =
 squareup-okhttp3-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 squareup-okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 maplibre-android-sdk = { group = "org.maplibre.gl", name = "android-sdk", version.ref = "maplibre" }
+maplibre-markerview = { group = "org.maplibre.gl", name = "android-plugin-markerview-v9", version.ref = "maplibre-plugin" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 

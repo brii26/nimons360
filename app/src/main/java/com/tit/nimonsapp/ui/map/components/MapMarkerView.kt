@@ -1,0 +1,94 @@
+package com.tit.nimonsapp.ui.map.components
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
+import com.tit.nimonsapp.R
+import com.tit.nimonsapp.ui.common.AvatarView
+
+/**
+ * Custom marker view untuk di MapLibre
+ *
+ * Tipe marker:
+ * - CURRENT_USER: Avatar dengan arrow orientation (biru bg, icon putih)
+ * - OTHER_USER: Avatar bulat biasa (dengan huruf inisial)
+ */
+class MapMarkerView @JvmOverloads constructor(
+    context: Context,
+    private val markerType: MarkerType = MarkerType.OTHER_USER,
+) : FrameLayout(context) {
+
+    private val avatarView: AvatarView
+    private var letter = ""
+    private var avatarColor = 0
+
+    enum class MarkerType {
+        CURRENT_USER,
+        OTHER_USER,
+    }
+
+    init {
+        val layoutId = when (markerType) {
+            MarkerType.CURRENT_USER -> R.layout.view_map_marker_current_user
+            MarkerType.OTHER_USER -> R.layout.view_map_marker_other_user
+        }
+
+        LayoutInflater.from(context).inflate(layoutId, this, true)
+
+        avatarView = findViewById(R.id.marker_avatar)
+
+        // Set initial size
+        val size = when (markerType) {
+            MarkerType.CURRENT_USER -> 56f.dpToPx(context).toInt()
+            MarkerType.OTHER_USER -> 44f.dpToPx(context).toInt()
+        }
+        layoutParams = LayoutParams(size, size)
+    }
+
+    fun setMarkerData(
+        letter: String,
+        color: Int = ContextCompat.getColor(context, R.color.colorPrimary),
+    ) {
+        this.letter = letter.take(1).uppercase()
+        this.avatarColor = color
+        avatarView.setLetter(this.letter, this.avatarColor)
+    }
+
+    /**
+     * Set rotation for the arrow in CURRENT_USER marker
+     */
+    fun setMarkerRotation(rotation: Float) {
+        if (markerType == MarkerType.CURRENT_USER) {
+            // Find and rotate the arrow image view
+            val arrow = findViewById<ImageView>(R.id.iv_arrow)
+            arrow?.rotation = rotation + 180f
+        }
+    }
+
+    /**
+     * Convert this view ke Bitmap untuk digunakan di MapLibre marker
+     */
+    fun toBitmap(): Bitmap {
+        val spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        measure(spec, spec)
+        layout(0, 0, measuredWidth, measuredHeight)
+
+        val bitmap = Bitmap.createBitmap(
+            if (measuredWidth > 0) measuredWidth else 1,
+            if (measuredHeight > 0) measuredHeight else 1,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        draw(canvas)
+        return bitmap
+    }
+
+    private fun Float.dpToPx(context: Context): Float {
+        return this * context.resources.displayMetrics.density
+    }
+}
