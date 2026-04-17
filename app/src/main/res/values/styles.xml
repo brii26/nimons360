@@ -38,6 +38,24 @@
 		<item name="android:textColor">@color/error</item>
 	</style>
 
+	<!-- Bottom Sheet -->
+	<style name="AppBottomSheet" parent="Theme.Material3.Light.BottomSheetDialog">
+		<item name="bottomSheetStyle">@style/AppBottomSheet.Style</item>
+	</style>
+
+	<style name="AppBottomSheet.Style" parent="Widget.Material3.BottomSheet.Modal">
+		<item name="shapeAppearanceOverlay">@style/AppBottomSheet.ShapeOverlay</item>
+		<item name="backgroundTint">@color/white</item>
+	</style>
+
+	<style name="AppBottomSheet.ShapeOverlay">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSizeTopLeft">28dp</item>
+		<item name="cornerSizeTopRight">28dp</item>
+		<item name="cornerSizeBottomLeft">0dp</item>
+		<item name="cornerSizeBottomRight">0dp</item>
+	</style>
+
 	<!-- Input Field -->
 	<style name="InputField">
 		<item name="android:padding">8dp</item>
