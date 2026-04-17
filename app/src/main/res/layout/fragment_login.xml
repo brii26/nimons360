@@ -4,10 +4,15 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	style="@style/ScrollViewDefault"
->
+	android:background="@color/white"
+	android:isScrollContainer="true"
+	android.fillViewport="true" >
 
 	<LinearLayout 
-		style="@style/Login.Container" >
+		style="@style/Login.Container" 
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+	>
 
 		<LinearLayout
 			style="@style/Login.Header" >
@@ -28,31 +33,26 @@
 
 		<com.tit.nimonsapp.ui.common.InputFieldView
 			android:id="@+id/email_input"
-			style="@style/Login.Input"
-			android:layout_marginTop="24dp"
+			style="@style/InputField"
+			android:layout_marginTop="33dp"
 			app:leftIcon="@drawable/ic_mail"
 			app:placeholderText="@string/login_email_placeholder" />
 
 		<com.tit.nimonsapp.ui.common.InputFieldView
 			android:id="@+id/password_input"
-			style="@style/Login.Input"
-			android:layout_marginTop="12dp"
+			style="@style/InputField"
+			android:inputType="textPassword"
 			app:leftIcon="@drawable/ic_lock"
 			app:placeholderText="@string/login_password_placeholder"
-			app:rightActionText="Show" />
-
-		<TextView android:id="@+id/error_text"
-			style="@style/Login.ErrorText"
-			tools:text="Invalid email or password"
-			tools:visibility="visible" />
+			app:rightActionIcon="@drawable/ic_show" />
 
 		<ProgressBar android:id="@+id/loading_indicator"
 			style="@style/Login.LoadingIndicator"
 			tools:visibility="visible" />
 
-		<com.tit.nimonsapp.ui.common.ButtonPrimaryView
+		<com.tit.nimonsapp.ui.common.ButtonView
 			android:id="@+id/login_button"
-			style="@style/Button.Primary.Login"
+			style="@style/Button.Filled"
 			android:text="@string/login_button" />
 
 	</LinearLayout>

@@ -4,22 +4,22 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/navigation_graphs"
-	app:startDestination="@id/startupFragment">
-	<!-- ini buat testing GPS doang -->
-	<!--app:startDestination="@id/locationTestFragment">-->
 
-	<!-- startup route -->
-	<fragment android:id="@+id/startupFragment"
-		android:name="com.tit.nimonsapp.ui.startup.StartupFragment"
-		android:label="startup">
+	app:startDestination="@id/splashFragment">
+
+
+	<!-- splash route -->
+	<fragment android:id="@+id/splashFragment"
+		android:name="com.tit.nimonsapp.ui.splash.SplashFragment"
+		android:label="splash">
 
 		<action
-			android:id="@+id/action_startupFragment_to_loginFragment"
+			android:id="@+id/action_splashFragment_to_loginFragment"
 			app:destination="@id/loginFragment" app:popUpTo="@id/navigation_graphs"
 			app:popUpToInclusive="true" />
 
 		<action
-			android:id="@+id/action_startupFragment_to_homeFragment"
+			android:id="@+id/action_splashFragment_to_homeFragment"
 			app:destination="@id/homeFragment" app:popUpTo="@id/navigation_graphs"
 			app:popUpToInclusive="true" />
 	</fragment>
@@ -46,6 +46,10 @@
 		<action
 			android:id="@+id/action_homeFragment_to_createFamilyFragment"
 			app:destination="@id/createFamilyFragment" />
+
+		<action
+			android:id="@+id/action_homeFragment_to_familyDetailFragment"
+			app:destination="@id/familyDetailFragment" />
 	</fragment>
 
 	<!-- families route -->

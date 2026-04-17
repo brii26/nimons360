@@ -8,4 +8,9 @@
 		<item name="colorError">@color/error</item>
 	</style>
 	<style name="Theme.NimonsApp" parent="Base.Theme.NimonsApp" />
+
+	<style name="Theme.NimonsApp.Splash" parent="Theme.SplashScreen">
+		<item name="windowSplashScreenBackground">@color/white</item>
+<item name="postSplashScreenTheme">@style/Theme.NimonsApp</item>
+	</style>
 </resources>

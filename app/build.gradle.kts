@@ -65,8 +65,9 @@ dependencies {
     implementation(libs.squareup.okhttp3.okhttp)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.android.support.recyclerview.v7)
-    implementation(libs.android.support.cardview.v7)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.squareup.retrofit2.retrofit)
     implementation(libs.squareup.retrofit2.converter.kotlinx.serialization)
     implementation(libs.jetbrains.kotlinx.serialization.json)
@@ -86,4 +87,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.compose.icons.extended)
+    implementation(libs.coil.compose)
 }

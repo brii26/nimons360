@@ -28,47 +28,53 @@ class LoginViewModel(
         }
     }
 
-    fun login() {
-        val email = uiState.value.email.trim()
-        val password = uiState.value.password
+	fun login() {
+		val email = uiState.value.email.trim()
+		val password = uiState.value.password
 
-        if (email.isBlank() || password.isBlank()) {
-            updateState {
-                withMeta(meta.copy(errorMessage = "Email and password must not be empty"))
-            }
-            return
-        }
+		if (email.isBlank()) {
+			updateState {
+				withMeta(meta.copy(errorMessage = "Email is required"))
+			}
+			return
+		}
 
-        viewModelScope.launch {
-            updateState {
-                withMeta(UiResourceMeta(isLoading = true, errorMessage = null))
-            }
+		if (password.isBlank()) {
+			updateState {
+				withMeta(meta.copy(errorMessage = "Password is required"))
+			}
+			return
+		}
 
-            runCatching {
-                authRepository.login(email, password)
-            }.onSuccess { response ->
-                sessionRepository.saveToken(response.token)
-                updateState {
-                    copy(
-                        meta = UiResourceMeta(),
-                        password = "",
-                        isLoggedIn = true,
-                    )
-                }
-            }.onFailure { throwable ->
-                updateState {
-                    copy(
-                        meta =
-                            UiResourceMeta(
-                                isLoading = false,
-                                errorMessage = throwable.message ?: "Login failed",
-                            ),
-                        isLoggedIn = false,
-                    )
-                }
-            }
-        }
-    }
+		viewModelScope.launch {
+			updateState {
+				withMeta(UiResourceMeta(isLoading = true, errorMessage = null))
+			}
+
+			runCatching {
+				authRepository.login(email, password)
+			}.onSuccess { response ->
+				sessionRepository.saveToken(response.token)
+				updateState {
+					copy(
+						meta = UiResourceMeta(),
+						password = "",
+						isLoggedIn = true,
+					)
+				}
+			}.onFailure { throwable ->
+				updateState {
+					copy(
+						meta = UiResourceMeta(
+							isLoading = false,
+							errorMessage = throwable.message ?: "Login failed",
+						),
+						isLoggedIn = false,
+					)
+				}
+			}
+		}
+	}
 
     fun consumeLoginSuccess() {
         updateState {

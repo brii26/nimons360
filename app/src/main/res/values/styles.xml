@@ -10,23 +10,79 @@
 		<item name="android:fillViewport">true</item>
 	</style>
 
-	<style name="Button.Primary">
-		<item name="android:layout_width">wrap_content</item>
+	<style name="Button.Filled">
+		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">wrap_content</item>
 		<item name="cornerRadius">17dp</item>
+		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
+	</style>
+
+	<style name="Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="cornerRadius">17dp</item>
+		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
+		<item name="strokeColor">?attr/colorPrimary</item>
+		<item name="android:textColor">?attr/colorPrimary</item>
+	</style>
+
+	<style name="Button.Destructive" parent="Widget.MaterialComponents.Button.OutlinedButton">
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="cornerRadius">17dp</item>
+		<item name="android:textAllCaps">false</item>
+		<item name="android:paddingVertical">13dp</item>
+		<item name="strokeColor">@color/error</item>
+		<item name="android:textColor">@color/error</item>
+	</style>
+
+	<!-- Floating Modal -->
+	<style name="AppFloatingModal" parent="ThemeOverlay.Material3.Dialog">
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:windowMinWidthMajor">88%</item>
+		<item name="android:windowMinWidthMinor">88%</item>
+	</style>
+
+	<!-- Bottom Sheet -->
+	<style name="AppBottomSheet" parent="Theme.Material3.Light.BottomSheetDialog">
+		<item name="bottomSheetStyle">@style/AppBottomSheet.Style</item>
+	</style>
+
+	<style name="AppBottomSheet.Style" parent="Widget.Material3.BottomSheet.Modal">
+		<item name="shapeAppearanceOverlay">@style/AppBottomSheet.ShapeOverlay</item>
+		<item name="backgroundTint">@color/white</item>
+	</style>
+
+	<style name="AppBottomSheet.ShapeOverlay">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSizeTopLeft">28dp</item>
+		<item name="cornerSizeTopRight">28dp</item>
+		<item name="cornerSizeBottomLeft">0dp</item>
+		<item name="cornerSizeBottomRight">0dp</item>
 	</style>
 
 	<!-- Input Field -->
+	<style name="InputField">
+		<item name="android:padding">8dp</item>
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+	</style>
+
 	<style name="StyleLeftIcon">
 		<item name="android:layout_width">24dp</item>
 		<item name="android:layout_height">24dp</item>
+		<item name="android:layout_marginRight">18dp</item>
 	</style>
 
 	<style name="StyleContent">
 		<item name="android:layout_width">0dp</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="android:layout_marginStart">20dp</item>
+		<item name="android:layout_marginLeft">15dp</item>
+		<item name="android:background">@android:color/transparent</item> 
 	</style>
+
 
 	<style name="StyleRightAction">
 		<item name="android:layout_width">wrap_content</item>
@@ -42,7 +98,7 @@
 		<item name="android:orientation">vertical</item>
 		<item name="android:padding">24dp</item>
 		<item name="android:gravity">center_vertical</item>
-		<item name="android:layout_marginBottom">10dp</item>
+		<item name="android:layout_marginTop">-100dp</item>
 	</style>
 
 	<style name="Login.Header">
@@ -50,14 +106,12 @@
 		<item name="android:layout_height">wrap_content</item>
 		<item name="android:gravity">center_horizontal</item>
 		<item name="android:orientation">vertical</item>
-		<item name="android:layout_marginBottom">8dp</item>
 	</style>
 
 	<style name="Login.Title">
 		<item name="android:fontFamily">sans-serif-black</item>
 		<item name="android:layout_width">wrap_content</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="android:layout_marginTop">8dp</item>
 		<item name="android:textSize">28sp</item>
 	</style>
 
@@ -67,22 +121,6 @@
 		<item name="android:textSize">16sp</item>
 	</style>
 
-	<style name="Login.Input">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">wrap_content</item>
-		<item name="android:background">@drawable/border</item>
-		<item name="android:padding">8dp</item>
-		<item name="cornerRadius">5dp</item>
-	</style>
-
-	<style name="Login.ErrorText">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">wrap_content</item>
-		<item name="android:layout_marginTop">12dp</item>
-		<item name="android:textColor">@color/error</item>
-		<item name="android:visibility">gone</item>
-	</style>
-
 	<style name="Login.LoadingIndicator">
 		<item name="android:layout_width">wrap_content</item>
 		<item name="android:layout_height">wrap_content</item>
@@ -90,12 +128,15 @@
 		<item name="android:visibility">gone</item>
 	</style>
 
-	<style name="Button.Primary.Login">
+	<style name="SectionLabel">
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">wrap_content</item>
-		<item name="android:layout_marginTop">16dp</item>
+		<item name="android:layout_marginTop">24dp</item>
+		<item name="android:layout_marginBottom">4dp</item>
+		<item name="android:textSize">13sp</item>
 		<item name="android:textAllCaps">false</item>
-		<item name="android:paddingVertical">13dp</item>
+		<item name="android:textColor">?attr/colorOnSurfaceVariant</item>
 	</style>
+
 
 </resources>

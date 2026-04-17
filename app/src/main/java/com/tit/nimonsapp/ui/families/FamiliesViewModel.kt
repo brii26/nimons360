@@ -45,6 +45,14 @@ class FamiliesViewModel(
         )
     }
 
+    fun updateSearchQuery(query: String) {
+        updateState { copy(searchQuery = query) }
+    }
+
+    fun updateFilter(filter: FamiliesFilter) {
+        updateState { copy(selectedFilter = filter) }
+    }
+
     fun togglePinned(familyId: Int) {
         val currentPinned = uiState.value.pinnedFamilyIds.toMutableList()
 
@@ -57,7 +65,7 @@ class FamiliesViewModel(
         }
 
         updateState {
-            copy(pinnedFamilyIds = currentPinned.sorted())
+            copy(pinnedFamilyIds = currentPinned.toList())
         }
     }
 

@@ -12,8 +12,30 @@
 	<color name="white">#FFFFFF</color>
 	<color name="black">#000000</color>
 
+	<!-- Brand Colors from UI -->
+	<color name="primary_blue">#1967D2</color>
+	<color name="search_bar_bg">#F3F0F7</color>
+	<color name="chip_unselected_bg">#FFFFFF</color>
+	<color name="chip_unselected_stroke">#E0E0E0</color>
+	<color name="pin_active">#1967D2</color>
+	<color name="pin_inactive">#E0E0E0</color>
+	<color name="section_label">#616161</color>
+	<color name="fab_bg">#E8F0FE</color>
+
+	<!-- Splash Screen -->
+	<color name="splash_background">#FFFFFF</color>
+	<color name="splash_grid">#121212</color>
+	<color name="splash_pin">#FFD700</color>
+	<color name="splash_pin_dot">#121212</color>
+	<color name="splash_ripple">#4CAF50</color>
+	<color name="splash_text_primary">#121212</color>
+	<color name="splash_text_accent">#4CAF50</color>
+
 	<!-- Specific -->
 	<color name="colorPrimary">#3ab02c</color>
+	<color name="nimons_green">#4CAF50</color>
+	<color name="input_focused">#2f5eeb</color>
+	<color name="input_error">#B91C1C</color>
 	<color name="error">#B00020</color>
 	<color name="icon_container_background">#FFBB86FC</color>
 </resources>

@@ -4,6 +4,8 @@
         <attr name="leftIcon" format="reference" />
         <attr name="placeholderText" format="string" />
         <attr name="rightActionText" format="string" />
+		<attr name="rightActionIcon" format="reference" />
+		<attr name="android:inputType"/>
     </declare-styleable>
 
 
