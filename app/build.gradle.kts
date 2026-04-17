@@ -51,7 +51,8 @@ kotlin {
 }
 
 dependencies {
-    implementation("com.squareup.okhttp3:okhttp:5.3.0")
+    implementation(libs.maplibre.android.sdk)
+    implementation(libs.maplibre.markerview)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -85,6 +86,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.viewbinding)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material)
+    implementation(libs.play.services.location)
     implementation(libs.androidx.compose.icons.extended)
     implementation(libs.coil.compose)
 }

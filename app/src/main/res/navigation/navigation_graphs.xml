@@ -4,7 +4,9 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/navigation_graphs"
+
 	app:startDestination="@id/splashFragment">
+
 
 	<!-- splash route -->
 	<fragment android:id="@+id/splashFragment"
@@ -111,5 +113,11 @@
 			android:id="@+id/action_createFamilyFragment_to_familiesFragment"
 			app:destination="@id/familiesFragment" />
 	</fragment>
+
+	<!-- location test route -->
+	<fragment android:id="@+id/locationTestFragment"
+		android:name="com.tit.nimonsapp.ui.LocationTestFragment"
+		android:label="location_test"
+		tools:layout="@layout/fragment_location_test" />
 
 </navigation>

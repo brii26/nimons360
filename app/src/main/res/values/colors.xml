@@ -32,6 +32,7 @@
 	<color name="splash_text_accent">#4CAF50</color>
 
 	<!-- Specific -->
+	<color name="colorPrimary">#3ab02c</color>
 	<color name="nimons_green">#4CAF50</color>
 	<color name="input_focused">#2f5eeb</color>
 	<color name="input_error">#B91C1C</color>
