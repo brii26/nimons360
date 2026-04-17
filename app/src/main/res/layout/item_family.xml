@@ -26,10 +26,12 @@
             app:cardElevation="0dp"
             app:strokeWidth="0dp">
 
-            <androidx.compose.ui.platform.ComposeView
-                android:id="@+id/family_icon_compose"
+            <ImageView
+                android:id="@+id/iv_family_icon"
                 android:layout_width="48dp"
-                android:layout_height="48dp" />
+                android:layout_height="48dp"
+                android:scaleType="centerInside"
+                tools:src="@drawable/ic_app" />
 
         </com.google.android.material.card.MaterialCardView>
 

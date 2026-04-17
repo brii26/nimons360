@@ -4,234 +4,111 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.PushPin
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tit.nimonsapp.R
-import com.tit.nimonsapp.data.network.GetFamiliesResponseDto
-import com.tit.nimonsapp.ui.common.iconImage
-import com.tit.nimonsapp.ui.common.sectionTitle
+import com.tit.nimonsapp.databinding.FragmentFamiliesBinding
+import kotlinx.coroutines.launch
 
 class FamiliesFragment : Fragment() {
+    private var _binding: FragmentFamiliesBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: FamiliesViewModel by viewModels()
+
+    private lateinit var pinnedAdapter: FamiliesAdapter
+    private lateinit var allFamiliesAdapter: FamiliesAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                FamiliesScreen(
-                    viewModel = viewModel,
-                    onCreateFamily = {
-                        findNavController().navigate(R.id.action_familiesFragment_to_createFamilyFragment)
-                    },
-                    onNavigateToDetail = { familyId ->
-                        val bundle = bundleOf("familyId" to familyId)
-                        findNavController().navigate(R.id.action_familiesFragment_to_familyDetailFragment, bundle)
-                    }
-                )
-            }
-        }
+        _binding = FragmentFamiliesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupAdapters()
+        setupListeners()
+        observeUiState()
+
         viewModel.loadFamilies()
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FamiliesScreen(
-    viewModel: FamiliesViewModel,
-    onCreateFamily: () -> Unit,
-    onNavigateToDetail: (Int) -> Unit
-) {
-    val uiState by viewModel.uiState.collectAsState()
+    private fun setupAdapters() {
+        pinnedAdapter = FamiliesAdapter(
+            onPinClick = { id -> viewModel.togglePinned(id) },
+            onItemClick = { id -> navigateToDetail(id) }
+        )
+        
+        allFamiliesAdapter = FamiliesAdapter(
+            onPinClick = { id -> viewModel.togglePinned(id) },
+            onItemClick = { id -> navigateToDetail(id) }
+        )
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onCreateFamily,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Family")
-            }
+        binding.pinnedRecycler.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = pinnedAdapter
         }
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(bottom = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header Section
-            item {
-                Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                    Text(
-                        text = "Families",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Search Bar
-                    TextField(
-                        value = uiState.searchQuery,
-                        onValueChange = { viewModel.updateSearchQuery(it) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp)),
-                        placeholder = { Text("Search families...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                        ),
-                        singleLine = true
-                    )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    // Filter Chips
-                    Row {
-                        FilterChip(
-                            selected = uiState.selectedFilter == FamiliesFilter.ALL,
-                            onClick = { viewModel.updateFilter(FamiliesFilter.ALL) },
-                            label = { Text("All") },
-                            shape = RoundedCornerShape(20.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        FilterChip(
-                            selected = uiState.selectedFilter == FamiliesFilter.MY_FAMILIES,
-                            onClick = { viewModel.updateFilter(FamiliesFilter.MY_FAMILIES) },
-                            label = { Text("My Families") },
-                            shape = RoundedCornerShape(20.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        )
-                    }
-                }
-            }
 
-            // Pinned Section
-            if (uiState.pinnedFamilies.isNotEmpty()) {
-                item {
-                    sectionTitle("PINNED")
-                }
-                items(uiState.pinnedFamilies, key = { "pinned_${it.id}" }) { family ->
-                    FamilyItemCompose(
-                        family = family,
-                        isPinned = true,
-                        onPinClick = { viewModel.togglePinned(family.id) },
-                        onClick = { onNavigateToDetail(family.id) }
-                    )
-                }
-            }
+        binding.allFamiliesRecycler.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = allFamiliesAdapter
+        }
+    }
 
-            // All Families Section
-            item {
-                sectionTitle("ALL FAMILIES")
+    private fun navigateToDetail(familyId: Int) {
+        val bundle = bundleOf("familyId" to familyId)
+        findNavController().navigate(R.id.action_familiesFragment_to_familyDetailFragment, bundle)
+    }
+
+    private fun setupListeners() {
+        binding.searchInput.addTextChangedListener { text ->
+            viewModel.updateSearchQuery(text?.toString() ?: "")
+        }
+
+        binding.filterChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val filter = when (checkedIds.firstOrNull()) {
+                R.id.chip_my_families -> FamiliesFilter.MY_FAMILIES
+                else -> FamiliesFilter.ALL
             }
-            
-            items(uiState.filteredAllFamilies, key = { "all_${it.id}" }) { family ->
-                FamilyItemCompose(
-                    family = family,
-                    isPinned = family.id in uiState.pinnedFamilyIds,
-                    onPinClick = { viewModel.togglePinned(family.id) },
-                    onClick = { onNavigateToDetail(family.id) }
-                )
+            viewModel.updateFilter(filter)
+        }
+
+        binding.fabAddFamily.setOnClickListener {
+            findNavController().navigate(R.id.action_familiesFragment_to_createFamilyFragment)
+        }
+    }
+
+    private fun observeUiState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    pinnedAdapter.setPinnedIds(state.pinnedFamilyIds)
+                    pinnedAdapter.submitList(state.pinnedFamilies)
+                    
+                    allFamiliesAdapter.setPinnedIds(state.pinnedFamilyIds)
+                    allFamiliesAdapter.submitList(state.filteredAllFamilies)
+                    
+                    binding.pinnedLabel.visibility = if (state.pinnedFamilies.isEmpty()) View.GONE else View.VISIBLE
+                    binding.pinnedRecycler.visibility = if (state.pinnedFamilies.isEmpty()) View.GONE else View.VISIBLE
+                }
             }
         }
     }
-}
 
-@Composable
-fun FamilyItemCompose(
-    family: GetFamiliesResponseDto,
-    isPinned: Boolean,
-    onPinClick: () -> Unit,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icon with white background
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(16.dp),
-                color = Color.White
-            ) {
-                iconImage(iconUrl = family.iconUrl, size = 48.dp)
-            }
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            Text(
-                text = family.name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            IconButton(onClick = onPinClick) {
-                Icon(
-                    imageVector = if (isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
-                    contentDescription = "Pin",
-                    tint = if (isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-                )
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

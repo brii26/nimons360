@@ -2,14 +2,14 @@ package com.tit.nimonsapp.ui.families
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.ui.unit.dp
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.data.network.GetFamiliesResponseDto
 import com.tit.nimonsapp.databinding.ItemFamilyBinding
-import com.tit.nimonsapp.ui.common.iconImage
 
 class FamiliesAdapter(
     private val onPinClick: (Int) -> Unit,
@@ -44,9 +44,12 @@ class FamiliesAdapter(
         fun bind(family: GetFamiliesResponseDto, isPinned: Boolean) {
             binding.familyName.text = family.name
             
-            // Set content for ComposeView to show the family icon
-            binding.familyIconCompose.setContent {
-                iconImage(iconUrl = family.iconUrl, size = 48.dp)
+            // Gunakan Coil langsung ke ImageView (Hapus ComposeView di XML nanti)
+            binding.ivFamilyIcon.load(family.iconUrl) {
+                crossfade(true)
+                placeholder(R.drawable.ic_app)
+                error(R.drawable.ic_app)
+                transformations(RoundedCornersTransformation(32f))
             }
             
             binding.pinButton.setImageResource(
