@@ -38,6 +38,13 @@
 		<item name="android:textColor">@color/error</item>
 	</style>
 
+	<!-- Floating Modal -->
+	<style name="AppFloatingModal" parent="ThemeOverlay.Material3.Dialog">
+		<item name="android:windowBackground">@android:color/transparent</item>
+		<item name="android:windowMinWidthMajor">88%</item>
+		<item name="android:windowMinWidthMinor">88%</item>
+	</style>
+
 	<!-- Bottom Sheet -->
 	<style name="AppBottomSheet" parent="Theme.Material3.Light.BottomSheetDialog">
 		<item name="bottomSheetStyle">@style/AppBottomSheet.Style</item>
