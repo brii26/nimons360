@@ -5,6 +5,7 @@ import com.tit.nimonsapp.data.repository.AuthRepository
 import com.tit.nimonsapp.data.repository.FamilyRepository
 import com.tit.nimonsapp.ui.common.AuthenticatedRefreshableViewModel
 import com.tit.nimonsapp.ui.common.UiResourceMeta
+import retrofit2.HttpException
 
 class FamilyDetailViewModel(
     application: Application,
@@ -13,7 +14,11 @@ class FamilyDetailViewModel(
     private val authRepository = AuthRepository()
     private var currentFamilyId: Int? = null
 
-    override fun FamilyDetailUiState.withMeta(meta: UiResourceMeta): FamilyDetailUiState = copy(meta = meta)
+    override fun FamilyDetailUiState.withMeta(meta: UiResourceMeta): FamilyDetailUiState = 
+        copy(
+            meta = meta,
+            isSubmittingAction = if (meta.errorMessage != null) false else isSubmittingAction
+        )
 
     override fun FamilyDetailUiState.withRefreshing(isRefreshing: Boolean): FamilyDetailUiState = copy(isRefreshing = isRefreshing)
 
@@ -46,6 +51,48 @@ class FamilyDetailViewModel(
         )
     }
 
+    fun joinFamily(familyCode: String, onJoinSuccess: () -> Unit) {
+        val familyId = currentFamilyId ?: uiState.value.familyDetail?.id ?: return
+
+        if (familyCode.isBlank()) {
+            updateState {
+                copy(meta = meta.copy(errorMessage = "Family code must not be empty"))
+            }
+            return
+        }
+
+        executeAuthenticatedAction(
+            errorMessageFallback = "Wrong Family Code!",
+            onStart = {
+                copy(
+                    isSubmittingAction = true,
+                    meta = meta.copy(errorMessage = null),
+                )
+            },
+            action = { token ->
+                try {
+                    familyRepository.joinFamily(token, familyId, familyCode.trim())
+                } catch (e: HttpException) {
+                    if (e.code() == 403) {
+                        throw Exception("Wrong Family Code!")
+                    }
+                    throw e
+                }
+            },
+            onSuccess = {
+                copy(isSubmittingAction = false)
+            },
+            afterSuccess = {
+                onJoinSuccess()
+                refresh()
+            },
+        )
+    }
+
+    override fun clearError() {
+        super.clearError()
+    }
+
     fun leaveFamily(onSuccess: () -> Unit) {
         val familyId = currentFamilyId ?: uiState.value.familyDetail?.id ?: return
 
@@ -54,7 +101,7 @@ class FamilyDetailViewModel(
             onStart = {
                 copy(
                     isSubmittingAction = true,
-                    meta = UiResourceMeta(isLoading = false, errorMessage = null),
+                    meta = meta.copy(errorMessage = null),
                 )
             },
             action = { token ->
