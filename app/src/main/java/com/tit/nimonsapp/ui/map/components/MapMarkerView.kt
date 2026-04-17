@@ -13,10 +13,6 @@ import com.tit.nimonsapp.ui.common.AvatarView
 
 /**
  * Custom marker view untuk di MapLibre
- *
- * Tipe marker:
- * - CURRENT_USER: Avatar dengan arrow orientation (biru bg, icon putih)
- * - OTHER_USER: Avatar bulat biasa (dengan huruf inisial)
  */
 class MapMarkerView @JvmOverloads constructor(
     context: Context,
@@ -42,12 +38,16 @@ class MapMarkerView @JvmOverloads constructor(
 
         avatarView = findViewById(R.id.marker_avatar)
 
-        // Set initial size
+        // Set initial size marker
         val size = when (markerType) {
             MarkerType.CURRENT_USER -> 56f.dpToPx(context).toInt()
             MarkerType.OTHER_USER -> 44f.dpToPx(context).toInt()
         }
         layoutParams = LayoutParams(size, size)
+        
+        // Penting: Pastikan view bisa diklik agar onClickListener jalan
+        isClickable = true
+        isFocusable = true
     }
 
     fun setMarkerData(
@@ -59,20 +59,13 @@ class MapMarkerView @JvmOverloads constructor(
         avatarView.setLetter(this.letter, this.avatarColor)
     }
 
-    /**
-     * Set rotation for the arrow in CURRENT_USER marker
-     */
     fun setMarkerRotation(rotation: Float) {
         if (markerType == MarkerType.CURRENT_USER) {
-            // Find and rotate the arrow image view
             val arrow = findViewById<ImageView>(R.id.iv_arrow)
-            arrow?.rotation = rotation + 180f
+            arrow?.rotation = rotation
         }
     }
 
-    /**
-     * Convert this view ke Bitmap untuk digunakan di MapLibre marker
-     */
     fun toBitmap(): Bitmap {
         val spec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
         measure(spec, spec)

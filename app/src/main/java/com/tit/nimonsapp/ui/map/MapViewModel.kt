@@ -4,20 +4,36 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.tit.nimonsapp.data.network.WebSocketRepository
 import com.tit.nimonsapp.data.network.WebSocketMessageType
-import com.tit.nimonsapp.ui.common.BaseStateViewModel
+import com.tit.nimonsapp.ui.common.AuthenticatedRefreshableViewModel
 import com.tit.nimonsapp.ui.common.UiResourceMeta
+import com.tit.nimonsapp.data.network.GetMeResponseDto
+import com.tit.nimonsapp.data.repository.AuthRepository
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class MapViewModel(
     private val application: Application,
     private val webSocketRepository: WebSocketRepository,
-    private val token: String,
-) : BaseStateViewModel<MapUiState>(application, MapUiState()) {
+) : AuthenticatedRefreshableViewModel<MapUiState>(application, MapUiState()) {
     override fun MapUiState.withMeta(meta: UiResourceMeta): MapUiState = copy(meta = meta)
+    override fun MapUiState.withRefreshing(isRefreshing: Boolean): MapUiState = copy(isRefreshing = isRefreshing)
+
+    private val authRepository = AuthRepository()
 
     private var isLocationSending = false
+
+    fun loadCurrentUserProfile() {
+        executeAuthenticatedLoad(
+            isRefresh = false,
+            errorMessageFallback = "Failed to load profile",
+            loader = { token -> authRepository.getMe(token) },
+            onSuccess = { profile -> 
+                copy(currentUserProfile = profile)
+            }
+        )
+    }
 
     fun updateCurrentLocation(latitude: Double, longitude: Double, rotation: Double, batteryLevel: Int, isCharging: Boolean, internetStatus: String) {
         updateState {
@@ -36,11 +52,18 @@ class MapViewModel(
 
     fun connectWebSocket() {
         viewModelScope.launch {
+            val token = sessionRepository.getToken()
+            if (token == null) {
+                updateState { onMissingSession() }
+                return@launch
+            }
+
             updateState {
                 withMeta(UiResourceMeta(isLoading = true, errorMessage = null))
             }
 
             webSocketRepository.connect(token)
+            loadCurrentUserProfile()
 
             webSocketRepository.observeMessages().collect { message ->
                 when (message.type) {
@@ -87,9 +110,10 @@ class MapViewModel(
         viewModelScope.launch {
             while (uiState.value.isSocketConnected && isLocationSending) {
                 val location = uiState.value.currentLocation
+                val userName = uiState.value.currentUserProfile?.fullName ?: "Me"
 
                 val payload = JSONObject().apply {
-                    put("name", "Me") // TODO: Get from user profile
+                    put("name", userName)
                     put("latitude", location.latitude)
                     put("longitude", location.longitude)
                     put("rotation", location.rotation)
@@ -100,8 +124,7 @@ class MapViewModel(
                 }
 
                 webSocketRepository.sendLocationUpdate(payload)
-
-                delay(1000) // Send every 1 second as per spec
+                delay(1000)
             }
         }
     }
@@ -142,7 +165,7 @@ class MapViewModel(
 
     fun removeOfflineUsers() {
         val now = System.currentTimeMillis()
-        val offlineTimeout = 5000L // 5 seconds as per spec
+        val offlineTimeout = 5000L
 
         updateState {
             copy(
@@ -163,5 +186,27 @@ class MapViewModel(
                 otherUsers = emptyMap(),
             )
         }
+    }
+
+    fun updateSearchQuery(query: String) {
+        updateState {
+            copy(searchQuery = query)
+        }
+    }
+
+    fun getFilteredUsers(): Map<Int, UserOnMap> {
+        val query = uiState.value.searchQuery.trim()
+        if (query.isEmpty()) {
+            return uiState.value.otherUsers
+        }
+
+        return uiState.value.otherUsers.filter { (_, user) ->
+            user.fullName.contains(query, ignoreCase = true) ||
+            user.email.contains(query, ignoreCase = true)
+        }
+    }
+
+    override fun refresh() {
+        loadCurrentUserProfile()
     }
 }

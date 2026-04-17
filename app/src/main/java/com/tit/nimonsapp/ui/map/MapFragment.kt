@@ -4,9 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -51,6 +54,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var currentUserMarkerView: MapMarkerView? = null
 
     private var userInfoBottomSheet: UserInfoBottomSheet? = null
+    private lateinit var mapSearchEditText: EditText
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -70,6 +74,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         MapLibre.getInstance(requireContext())
         val view = inflater.inflate(R.layout.fragment_map, container, false)
+
+        // Fix typo findViewByld -> findViewById and add type hint
+        mapSearchEditText = view.findViewById<EditText>(R.id.et_search) 
+            ?: view.findViewById<View>(R.id.map_search_bar)?.findViewById<EditText>(R.id.et_search) 
+            ?: EditText(requireContext())
 
         mapView = view.findViewById(R.id.mapView) ?: MapView(requireContext()).apply {
             val params = FrameLayout.LayoutParams(
@@ -92,7 +101,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         locationRepository = LocationRepository(requireContext())
         locationRepository.initialize()
 
-        // Menambahkan pingInterval untuk menjaga koneksi WebSocket tetap hidup
         val client = OkHttpClient.Builder()
             .pingInterval(30, TimeUnit.SECONDS)
             .build()
@@ -100,12 +108,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val webSocketManager = WebSocketManager(client)
         webSocketRepository = WebSocketRepository(webSocketManager)
 
-        val token = getToken()
-
-        val factory = MapViewModelFactory(requireActivity().application, webSocketRepository, token)
+        val factory = MapViewModelFactory(requireActivity().application, webSocketRepository)
         viewModel = ViewModelProvider(this, factory)[MapViewModel::class.java]
 
         observeViewModel()
+        setupSearchBar()
         requestLocationPermission()
     }
 
@@ -138,8 +145,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-
-    @SuppressLint
+    @SuppressLint("MissingPermission")
     private fun startLocationUpdatesAndConnect() {
         locationRepository.startLocationUpdates()
 
@@ -178,13 +184,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             currentUserMarkerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.CURRENT_USER).apply {
                 setMarkerData("M")
                 setMarkerRotation(location.rotation.toFloat())
+                isClickable = true
+                isFocusable = true
             }
 
             currentUserMarker = MarkerView(position, currentUserMarkerView!!).apply {
                 markerViewManager.addMarker(this)
             }
+
+            // Click listener for current user marker
+            currentUserMarkerView?.setOnClickListener {
+                showMyInfoBottomSheet()
+            }
             
-            // Animate camera hanya saat marker pertama kali dibuat (first location lock)
             mapLibreMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15.0))
         } else {
             currentUserMarker?.setLatLng(position)
@@ -195,7 +207,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
-                updateOtherUsersMarkers(state.otherUsers)
+                updateOtherUsersMarkers(viewModel.getFilteredUsers())
                 state.meta.errorMessage?.let { message ->
                     showSnackbar(message)
                 }
@@ -212,6 +224,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    private fun setupSearchBar() {
+        mapSearchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                viewModel.updateSearchQuery(s?.toString() ?: "")
+            }
+        })
     }
 
     private fun updateOtherUsersMarkers(users: Map<Int, UserOnMap>) {
@@ -233,11 +255,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (userId in markers) {
                 markers[userId]?.setLatLng(position)
             } else {
-                val markerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER)
-                markerView.setMarkerData(
-                    user.fullName.take(1).uppercase(),
-                    ContextCompat.getColor(requireContext(), R.color.blue),
-                )
+                val markerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER).apply {
+                    setMarkerData(
+                        user.fullName.take(1).uppercase(),
+                        ContextCompat.getColor(requireContext(), R.color.blue),
+                    )
+                    isClickable = true
+                    isFocusable = true
+                }
 
                 val marker = MarkerView(position, markerView).apply {
                     markerViewManager.addMarker(this)
@@ -264,6 +289,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun showMyInfoBottomSheet() {
+        dismissUserInfoBottomSheet()
+
+        val currentUser = viewModel.uiState.value.currentLocation
+        val profile = viewModel.uiState.value.currentUserProfile
+
+        val myUserOnMap = UserOnMap(
+            userId = profile?.id ?: 0,
+            fullName = profile?.fullName ?: "Me",
+            email = profile?.email ?: "me@std.stei.itb.ac.id",
+            latitude = currentUser.latitude,
+            longitude = currentUser.longitude,
+            rotation = currentUser.rotation,
+            batteryLevel = currentUser.batteryLevel,
+            isCharging = currentUser.isCharging,
+            internetStatus = currentUser.internetStatus,
+            lastUpdateTimestamp = System.currentTimeMillis(),
+        )
+
+        userInfoBottomSheet = UserInfoBottomSheet(requireContext()).apply {
+            setUser(myUserOnMap)
+            setOnDismissListener {
+                userInfoBottomSheet = null
+            }
+            show()
+        }
+    }
+
     private fun dismissUserInfoBottomSheet() {
         userInfoBottomSheet?.dismiss()
         userInfoBottomSheet = null
@@ -273,10 +326,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         view?.let {
             Snackbar.make(it, message, Snackbar.LENGTH_LONG).show()
         }
-    }
-
-    private fun getToken(): String {
-        return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiMTM1MjIwODRAc3RkLnN0ZWkuaXRiLmFjLmlkIiwiaWF0IjoxNzc2MzQ1NjMyLCJleHAiOjE3NzY5NTA0MzJ9.oP1HhfTm6rSXgRD8my96PQqtRWzL1ytaPf5NEwa-QKY"
     }
 
     override fun onStart() {

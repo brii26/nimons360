@@ -8,12 +8,11 @@ import com.tit.nimonsapp.data.network.WebSocketRepository
 class MapViewModelFactory(
     private val application: Application,
     private val webSocketRepository: WebSocketRepository,
-    private val token: String,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
-            return MapViewModel(application, webSocketRepository, token) as T
+            return MapViewModel(application, webSocketRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
