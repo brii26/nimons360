@@ -32,6 +32,7 @@ import androidx.navigation.fragment.findNavController
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.data.network.GetFamiliesResponseDto
 import com.tit.nimonsapp.ui.common.iconImage
+import com.tit.nimonsapp.ui.common.sectionTitle
 
 class FamiliesFragment : Fragment() {
     private val viewModel: FamiliesViewModel by viewModels()
@@ -76,8 +77,8 @@ fun FamiliesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateFamily,
-                containerColor = Color(0xFFE8F0FE),
-                contentColor = Color(0xFF1967D2),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Family")
@@ -88,17 +89,19 @@ fun FamiliesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Color.White),
-            contentPadding = PaddingValues(bottom = 80.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(bottom = 80.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Header Section
             item {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+                Column(modifier = Modifier.padding(vertical = 16.dp)) {
                     Text(
                         text = "Families",
-                        fontSize = 28.sp,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
@@ -110,12 +113,12 @@ fun FamiliesScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(24.dp)),
-                        placeholder = { Text("Search families...") },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+                        placeholder = { Text("Search families...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color(0xFFF3F0F7),
-                            unfocusedContainerColor = Color(0xFFF3F0F7),
-                            disabledContainerColor = Color(0xFFF3F0F7),
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                         ),
@@ -132,13 +135,8 @@ fun FamiliesScreen(
                             label = { Text("All") },
                             shape = RoundedCornerShape(20.dp),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color(0xFF1967D2),
-                                selectedLabelColor = Color.White
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                enabled = true,
-                                selected = uiState.selectedFilter == FamiliesFilter.ALL,
-                                borderColor = Color.LightGray
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -148,13 +146,8 @@ fun FamiliesScreen(
                             label = { Text("My Families") },
                             shape = RoundedCornerShape(20.dp),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color(0xFF1967D2),
-                                selectedLabelColor = Color.White
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                enabled = true,
-                                selected = uiState.selectedFilter == FamiliesFilter.MY_FAMILIES,
-                                borderColor = Color.LightGray
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                             )
                         )
                     }
@@ -164,13 +157,7 @@ fun FamiliesScreen(
             // Pinned Section
             if (uiState.pinnedFamilies.isNotEmpty()) {
                 item {
-                    Text(
-                        text = "PINNED",
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
+                    sectionTitle("PINNED")
                 }
                 items(uiState.pinnedFamilies, key = { "pinned_${it.id}" }) { family ->
                     FamilyItemCompose(
@@ -184,13 +171,7 @@ fun FamiliesScreen(
 
             // All Families Section
             item {
-                Text(
-                    text = "ALL FAMILIES",
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray
-                )
+                sectionTitle("ALL FAMILIES")
             }
             
             items(uiState.filteredAllFamilies, key = { "all_${it.id}" }) { family ->
@@ -215,10 +196,11 @@ fun FamilyItemCompose(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F0F7))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -238,16 +220,16 @@ fun FamilyItemCompose(
             Text(
                 text = family.name,
                 modifier = Modifier.weight(1f),
-                fontSize = 16.sp,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             IconButton(onClick = onPinClick) {
                 Icon(
                     imageVector = if (isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
                     contentDescription = "Pin",
-                    tint = if (isPinned) Color(0xFF1967D2) else Color.LightGray
+                    tint = if (isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
                 )
             }
         }
