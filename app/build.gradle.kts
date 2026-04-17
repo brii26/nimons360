@@ -85,4 +85,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.icons.extended)
+    implementation(libs.coil.compose)
 }
