@@ -4,6 +4,7 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	style="@style/ScrollViewDefault"
+	android:background="@color/white"
 	android:isScrollContainer="true"
 	android.fillViewport="true" >
 

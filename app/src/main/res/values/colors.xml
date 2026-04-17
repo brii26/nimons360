@@ -22,7 +22,17 @@
 	<color name="section_label">#616161</color>
 	<color name="fab_bg">#E8F0FE</color>
 
+	<!-- Splash Screen -->
+	<color name="splash_background">#FFFFFF</color>
+	<color name="splash_grid">#121212</color>
+	<color name="splash_pin">#FFD700</color>
+	<color name="splash_pin_dot">#121212</color>
+	<color name="splash_ripple">#4CAF50</color>
+	<color name="splash_text_primary">#121212</color>
+	<color name="splash_text_accent">#4CAF50</color>
+
 	<!-- Specific -->
+	<color name="nimons_green">#4CAF50</color>
 	<color name="input_focused">#2f5eeb</color>
 	<color name="input_error">#B91C1C</color>
 	<color name="error">#B00020</color>
