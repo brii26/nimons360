@@ -43,7 +43,7 @@ class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
         // Set avatar with first letter of name
         avatarView.setLetter(
             user.fullName.take(1).uppercase(),
-            ContextCompat.getColor(context, R.color.colorPrimary)
+            ContextCompat.getColor(context, R.color.nimons_green)
         )
 
         // Set name and email

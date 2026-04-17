@@ -55,7 +55,7 @@ class MapMarkerView @JvmOverloads constructor(
 
     fun setMarkerData(
         letter: String,
-        color: Int = ContextCompat.getColor(context, R.color.colorPrimary),
+        color: Int = ContextCompat.getColor(context, R.color.nimons_green),
     ) {
         this.letter = letter.take(1).uppercase()
         this.avatarColor = color

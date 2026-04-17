@@ -107,7 +107,7 @@ fun FamilyDetailScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF1967D2))
+                            .background(Color(0xFF4CAF50))
                             .padding(24.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -165,14 +165,14 @@ fun FamilyDetailScreen(
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F0FE))
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9))
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = "FAMILY CODE",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF1967D2)
+                                    color = Color(0xFF4CAF50)
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Row(
@@ -184,7 +184,7 @@ fun FamilyDetailScreen(
                                         text = family.familyCode ?: "-----",
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFF1967D2),
+                                        color = Color(0xFF4CAF50),
                                         letterSpacing = 4.sp
                                     )
                                     IconButton(
@@ -195,7 +195,7 @@ fun FamilyDetailScreen(
                                             Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show()
                                         },
                                         modifier = Modifier
-                                            .background(Color(0xFF1967D2), CircleShape)
+                                            .background(Color(0xFF4CAF50), CircleShape)
                                             .size(40.dp)
                                     ) {
                                         Icon(
@@ -295,7 +295,7 @@ fun FamilyDetailScreen(
                                 onClick = { showJoinDialog = true },
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
                                 shape = RoundedCornerShape(16.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1967D2))
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                             ) {
                                 Text("Join Family", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
@@ -389,13 +389,13 @@ fun JoinFamilyDialog(
                 Box(
                     modifier = Modifier
                         .size(64.dp)
-                        .background(Color(0xFFE8F0FE), CircleShape),
+                        .background(Color(0xFFE8F5E9), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Default.Group,
                         contentDescription = null,
-                        tint = Color(0xFF1967D2),
+                        tint = Color(0xFF4CAF50),
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -446,7 +446,7 @@ fun JoinFamilyDialog(
                             text = "${code.length}/6",
                             fontSize = 12.sp,
                             modifier = Modifier.padding(end = 8.dp),
-                            color = if (code.length == 6) Color(0xFF1967D2) else Color.Gray
+                            color = if (code.length == 6) Color(0xFF4CAF50) else Color.Gray
                         )
                     },
                     textStyle = TextStyle(
@@ -455,10 +455,10 @@ fun JoinFamilyDialog(
                         letterSpacing = 2.sp
                     ),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF1967D2),
+                        focusedBorderColor = Color(0xFF4CAF50),
                         unfocusedBorderColor = Color.LightGray,
                         errorBorderColor = Color.Red,
-                        focusedLabelColor = Color(0xFF1967D2),
+                        focusedLabelColor = Color(0xFF4CAF50),
                         errorLabelColor = Color.Red
                     )
                 )
@@ -481,7 +481,7 @@ fun JoinFamilyDialog(
                         onClick = { onJoin(code) },
                         enabled = code.length == 6 && !isLoading,
                         shape = RoundedCornerShape(24.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1967D2)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                         contentPadding = PaddingValues(horizontal = 32.dp, vertical = 12.dp)
                     ) {
                         if (isLoading) {
@@ -675,8 +675,8 @@ fun MemberItem(member: MaskedFamilyMemberDto, isMe: Boolean, isBlurred: Boolean 
 
 private fun getRandomColor(name: String): Color {
     val colors = listOf(
-        Color(0xFF1967D2), Color(0xFFD32F2F), Color(0xFF388E3C), Color(0xFFF57C00),
-        Color(0xFF7B1FA2), Color(0xFF00796B), Color(0xFF5D4037)
+        Color(0xFF4CAF50), Color(0xFFD32F2F), Color(0xFFE65100), Color(0xFFF57C00),
+        Color(0xFF0097A7), Color(0xFF00796B), Color(0xFF5D4037)
     )
     return colors[name.length % colors.size]
 }

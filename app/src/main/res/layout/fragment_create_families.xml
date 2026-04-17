@@ -46,7 +46,7 @@
                 android:gravity="center"
                 android:paddingHorizontal="16dp"
                 android:text="Create"
-                android:textColor="@color/primary_blue"
+                android:textColor="@color/nimons_green"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -74,7 +74,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    app:cardBackgroundColor="@color/primary_blue"
+                    app:cardBackgroundColor="@color/nimons_green"
                     app:cardCornerRadius="50dp"
                     app:cardElevation="0dp"
                     app:strokeWidth="0dp">
@@ -145,7 +145,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_info"
-                        app:tint="@color/primary_blue" />
+                        app:tint="@color/nimons_green" />
 
                     <TextView
                         android:layout_width="match_parent"

@@ -3,7 +3,7 @@
 	<style name="Base.Theme.NimonsApp" parent="Theme.Material3.DayNight.NoActionBar">
 		<item name="android:windowBackground">?attr/colorSurface</item>
 		<item name="android:fontFamily">sans-serif</item>
-		<item name="colorPrimary">@color/colorPrimary</item>
+		<item name="colorPrimary">@color/nimons_green</item>
 		<item name="colorOnPrimary">@color/white</item>
 		<item name="colorError">@color/error</item>
 	</style>

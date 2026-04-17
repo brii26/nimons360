@@ -75,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="All"
-                    app:chipBackgroundColor="@color/primary_blue"
+                    app:chipBackgroundColor="@color/nimons_green"
                     app:chipStrokeWidth="0dp"
                     android:textColor="@color/white" />
 
@@ -159,6 +159,6 @@
         android:contentDescription="Add Family"
         app:backgroundTint="@color/fab_bg"
         app:srcCompat="@android:drawable/ic_input_add"
-        app:tint="@color/primary_blue" />
+        app:tint="@color/nimons_green" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

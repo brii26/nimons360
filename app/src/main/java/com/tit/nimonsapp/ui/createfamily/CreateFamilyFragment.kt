@@ -82,7 +82,7 @@ class CreateFamilyFragment : Fragment() {
                     // Visual feedback for disabled state
                     binding.btnCreate.setTextColor(
                         if (binding.btnCreate.isEnabled) 
-                            resources.getColor(R.color.primary_blue, null)
+                            resources.getColor(R.color.nimons_green, null)
                         else 
                             resources.getColor(R.color.section_label, null)
                     )

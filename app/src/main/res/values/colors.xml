@@ -1,41 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- general -->
 
-	<!-- Literal -->
-	<color name="red">#F44336</color>
-	<color name="green">#4CAF50</color>
-	<color name="yellow">#FFC107</color>
-	<color name="blue">#2196F3</color>
-	<color name="indigo">#3F51B5</color>
-	<color name="purple">#9C27B0</color>
-	<color name="white">#FFFFFF</color>
-	<color name="black">#000000</color>
+    <!-- Literal -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="red">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="yellow">#FFC107</color>
 
-	<!-- Brand Colors from UI -->
-	<color name="primary_blue">#1967D2</color>
-	<color name="search_bar_bg">#F3F0F7</color>
-	<color name="chip_unselected_bg">#FFFFFF</color>
-	<color name="chip_unselected_stroke">#E0E0E0</color>
-	<color name="pin_active">#1967D2</color>
-	<color name="pin_inactive">#E0E0E0</color>
-	<color name="section_label">#616161</color>
-	<color name="fab_bg">#E8F0FE</color>
+    <!-- Brand -->
+    <color name="nimons_green">#4CAF50</color>
+    <color name="nimons_green_dark">#3ab02c</color>
+    <color name="nimons_yellow">#FFD700</color>
 
-	<!-- Splash Screen -->
-	<color name="splash_background">#FFFFFF</color>
-	<color name="splash_grid">#121212</color>
-	<color name="splash_pin">#FFD700</color>
-	<color name="splash_pin_dot">#121212</color>
-	<color name="splash_ripple">#4CAF50</color>
-	<color name="splash_text_primary">#121212</color>
-	<color name="splash_text_accent">#4CAF50</color>
+    <!-- Surface & Neutral -->
+    <color name="surface_light">#F8F9FA</color>
+    <color name="surface_green_tint">#E8F5E9</color>
+    <color name="surface_yellow_tint">#FFF8E1</color>
+    <color name="surface_red_tint">#FFEBEE</color>
+    <color name="tag_bg">#FFF4D2</color>
+    <color name="tag_text">#856404</color>
+    <color name="search_bar_bg">#F0F0F0</color>
+    <color name="chip_unselected_bg">#FFFFFF</color>
+    <color name="chip_unselected_stroke">#E0E0E0</color>
+    <color name="handle_color">#80D3D3D3</color>
+    <color name="pin_active">#4CAF50</color>
+    <color name="pin_inactive">#E0E0E0</color>
+    <color name="section_label">#616161</color>
+    <color name="fab_bg">#E8F5E9</color>
 
-	<!-- Specific -->
-	<color name="colorPrimary">#3ab02c</color>
-	<color name="nimons_green">#4CAF50</color>
-	<color name="input_focused">#2f5eeb</color>
-	<color name="input_error">#B91C1C</color>
-	<color name="error">#B00020</color>
-	<color name="icon_container_background">#FFBB86FC</color>
+    <!-- Banner -->
+    <color name="banner_bg">#E8F5E9</color>
+    <color name="banner_stripe">#4CAF50</color>
+    <color name="banner_text">#1B5E20</color>
+    <color name="family_code_bg">#E8F5E9</color>
+
+    <!-- Splash Screen -->
+    <color name="splash_background">#FFFFFF</color>
+    <color name="splash_grid">#121212</color>
+    <color name="splash_pin">#FFD700</color>
+    <color name="splash_pin_dot">#121212</color>
+    <color name="splash_ripple">#4CAF50</color>
+    <color name="splash_text_primary">#121212</color>
+    <color name="splash_text_accent">#4CAF50</color>
+
+    <!-- Input & Error -->
+    <color name="input_focused">#4CAF50</color>
+    <color name="input_error">#B91C1C</color>
+    <color name="error">#B00020</color>
+    <color name="circle_light_red">#FFF0F0</color>
+
+    <!-- Avatar palette -->
+    <color name="avatar_1">#0097A7</color>
+    <color name="avatar_2">#D83A34</color>
+    <color name="avatar_3">#43A047</color>
+    <color name="avatar_4">#F57C00</color>
+    <color name="avatar_5">#E65100</color>
+    <color name="avatar_6">#C2185B</color>
+    <color name="avatar_7">#388E3C</color>
+    <color name="avatar_8">#00796B</color>
+    <color name="avatar_9">#5D4037</color>
+
 </resources>

@@ -20,15 +20,4 @@
         <attr name="avatarBgColor" format="color|reference" />
     </declare-styleable>
 
-    <declare-styleable name="ListRowView">
-        <attr name="rowPrimaryText" format="string" />
-        <attr name="rowSecondaryText" format="string" />
-        <attr name="rowRightType" format="enum">
-            <enum name="none" value="0" />
-            <enum name="pin" value="1" />
-            <enum name="badge" value="2" />
-        </attr>
-        <attr name="rowBadgeText" format="string" />
-    </declare-styleable>
-
 </resources>

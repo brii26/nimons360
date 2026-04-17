@@ -258,7 +258,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val markerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER).apply {
                     setMarkerData(
                         user.fullName.take(1).uppercase(),
-                        ContextCompat.getColor(requireContext(), R.color.blue),
+                        ContextCompat.getColor(requireContext(), R.color.nimons_green),
                     )
                 }
 
