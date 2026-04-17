@@ -1,5 +1,6 @@
 package com.tit.nimonsapp.data.network
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,13 +23,18 @@ class WebSocketRepository(
 
     val onlineUsers: StateFlow<Map<Int, UserLocation>> = _onlineUsers.asStateFlow()
 
-    fun connect(url: String) {
-        manager.connect(url)
+    fun connect(token: String) {
+        val url = "https://mad.labpro.hmif.dev/ws/live"
+        manager.connect(url, token)
+    }
+
+    fun observeMessages(): Flow<WebSocketMessage> {
+        return manager.messages
     }
 
     fun sendMyLocation(location: UserLocation) {
         val payload = PresencePayload(
-            name = "",
+            name = "", // TODO: Get from user profile
             latitude = location.latitude,
             longitude = location.longitude,
             rotation = location.rotation,
@@ -38,6 +44,20 @@ class WebSocketRepository(
             metadata = emptyMap()
         )
         manager.sendPresenceUpdate(payload)
+    }
+
+    fun sendLocationUpdate(payload: org.json.JSONObject) {
+        val presencePayload = PresencePayload(
+            name = payload.optString("name", ""),
+            latitude = payload.optDouble("latitude", 0.0),
+            longitude = payload.optDouble("longitude", 0.0),
+            rotation = payload.optDouble("rotation", 0.0),
+            batteryLevel = payload.optInt("batteryLevel", 0),
+            isCharging = payload.optBoolean("isCharging", false),
+            internetStatus = payload.optString("internetStatus", "unknown"),
+            metadata = emptyMap()
+        )
+        manager.sendPresenceUpdate(presencePayload)
     }
 
     fun disconnect() {

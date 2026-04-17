@@ -1,5 +1,6 @@
 package com.tit.nimonsapp.data.repository
 
+import android.annotation.SuppressLint
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -106,7 +107,7 @@ class LocationRepository(private val context: Context) {
         context.registerReceiver(batteryReceiver, batteryIntentFilter)
     }
 
-    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    @SuppressLint("MissingPermission")
     fun startLocationUpdates() {
         if (!hasLocationPermission()) return
 
