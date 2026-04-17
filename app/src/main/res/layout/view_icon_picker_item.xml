@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    item grid icon picker , pake di RecyclerView create family
-    set isSelected = true di adapter buat highlight yang kepilih, load gambar lewat iv_icon_item
--->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="56dp"
-    android:layout_height="56dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:background="@drawable/bg_icon_picker_item"
     android:clickable="true"
     android:focusable="true"
@@ -14,10 +11,11 @@
 
     <ImageView
         android:id="@+id/iv_icon_item"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="center"
-        android:scaleType="centerCrop"
+        android:padding="8dp"
+        android:scaleType="centerInside"
         android:contentDescription="@null"/>
 
 </FrameLayout>
