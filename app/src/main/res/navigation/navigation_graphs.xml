@@ -44,6 +44,10 @@
 		<action
 			android:id="@+id/action_homeFragment_to_createFamilyFragment"
 			app:destination="@id/createFamilyFragment" />
+
+		<action
+			android:id="@+id/action_homeFragment_to_familyDetailFragment"
+			app:destination="@id/familyDetailFragment" />
 	</fragment>
 
 	<!-- families route -->

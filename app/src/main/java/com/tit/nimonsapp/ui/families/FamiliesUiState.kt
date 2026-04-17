@@ -29,5 +29,5 @@ data class FamiliesUiState(
             }
 
     val pinnedFamilies: List<GetFamiliesResponseDto>
-        get() = allFamilies.filter { it.id in pinnedFamilyIds }
+        get() = filteredAllFamilies.filter { it.id in pinnedFamilyIds }
 }
