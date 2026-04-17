@@ -430,7 +430,7 @@ fun JoinFamilyDialog(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Family Code") },
-                    placeholder = { Text("e.g. MFA287") },
+                    placeholder = { Text("e.g. TEGGER") },
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true,
                     isError = isError,
