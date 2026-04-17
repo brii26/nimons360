@@ -8,6 +8,7 @@ import com.tit.nimonsapp.ui.common.AuthenticatedRefreshableViewModel
 import com.tit.nimonsapp.ui.common.UiResourceMeta
 import com.tit.nimonsapp.data.network.GetMeResponseDto
 import com.tit.nimonsapp.data.repository.AuthRepository
+import com.tit.nimonsapp.data.repository.FamilyRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -21,9 +22,25 @@ class MapViewModel(
     override fun MapUiState.withRefreshing(isRefreshing: Boolean): MapUiState = copy(isRefreshing = isRefreshing)
 
     private val authRepository = AuthRepository()
+    private val familyRepository = FamilyRepository()
 
+    // Track GPS permission state - only send location updates when granted
+    private var hasGpsPermission = false
     private var isLocationSending = false
 
+     // Load current user profile for "My Info" and to get user ID for filtering.
+     // Set GPS permission status from Fragment.
+     // Dipanggil stlh permission granted to start location updates.
+    fun setGpsPermissionGranted(granted: Boolean) {
+        hasGpsPermission = granted
+        if (granted && !isLocationSending) {
+            startLocationUpdates()
+        }
+    }
+
+    /**
+     * Load current user profile for "My Info" and to get user ID for filtering.
+     */
     fun loadCurrentUserProfile() {
         executeAuthenticatedLoad(
             isRefresh = false,
@@ -35,6 +52,26 @@ class MapViewModel(
         )
     }
 
+    /**
+     * Load all family members from all joined families to whitelist who to show on map.
+     */
+    fun loadFamilyMembers() {
+        executeAuthenticatedLoad(
+            isRefresh = false,
+            errorMessageFallback = "Failed to load families",
+            loader = { token -> familyRepository.getMyFamilies(token) },
+            onSuccess = { families ->
+                val memberIds = families.flatMap { family -> 
+                    family.members.mapNotNull { it.id }
+                }.toSet()
+                copy(myFamilyMemberIds = memberIds)
+            }
+        )
+    }
+
+    /**
+     * Update current device location in local UI state.
+     */
     fun updateCurrentLocation(latitude: Double, longitude: Double, rotation: Double, batteryLevel: Int, isCharging: Boolean, internetStatus: String) {
         updateState {
             copy(
@@ -50,51 +87,26 @@ class MapViewModel(
         }
     }
 
-    fun connectWebSocket() {
+    /**
+     * Start observing WebSocket messages. Connection management is handled at Activity/Global level.
+     */
+    fun startObservingWebSocket() {
         viewModelScope.launch {
-            val token = sessionRepository.getToken()
-            if (token == null) {
-                updateState { onMissingSession() }
-                return@launch
-            }
-
-            updateState {
-                withMeta(UiResourceMeta(isLoading = true, errorMessage = null))
-            }
-
-            webSocketRepository.connect(token)
+            // Wait for profile and families to be loaded for filtering
             loadCurrentUserProfile()
+            loadFamilyMembers()
 
             webSocketRepository.observeMessages().collect { message ->
                 when (message.type) {
                     WebSocketMessageType.CONNECTED -> {
-                        updateState {
-                            copy(
-                                meta = UiResourceMeta(),
-                                isSocketConnected = true,
-                            )
-                        }
+                        updateState { copy(isSocketConnected = true) }
                         startLocationUpdates()
                     }
                     WebSocketMessageType.MEMBER_PRESENCE_UPDATED -> {
                         handleMemberPresenceUpdated(message.payload)
                     }
                     WebSocketMessageType.DISCONNECTED -> {
-                        updateState {
-                            copy(
-                                meta = UiResourceMeta(errorMessage = "WebSocket disconnected"),
-                                isSocketConnected = false,
-                            )
-                        }
-                        isLocationSending = false
-                    }
-                    WebSocketMessageType.ERROR -> {
-                        updateState {
-                            copy(
-                                meta = UiResourceMeta(errorMessage = message.errorMessage),
-                                isSocketConnected = false,
-                            )
-                        }
+                        updateState { copy(isSocketConnected = false) }
                         isLocationSending = false
                     }
                     else -> Unit
@@ -103,14 +115,22 @@ class MapViewModel(
         }
     }
 
+    /**
+     * Periodically send my location to the server via WebSocket.
+     * Only sends updates when GPS permission is granted.
+     */
     private fun startLocationUpdates() {
         if (isLocationSending) return
+        if (!hasGpsPermission) return  // Skip if permission denied
         isLocationSending = true
 
         viewModelScope.launch {
-            while (uiState.value.isSocketConnected && isLocationSending) {
-                val location = uiState.value.currentLocation
-                val userName = uiState.value.currentUserProfile?.fullName ?: "Me"
+            while (isLocationSending) {
+                // Send location every 1 second until stopped or permission revoked
+                delay(1000)
+                val state = uiState.value
+                val location = state.currentLocation
+                val userName = state.currentUserProfile?.fullName ?: "Me"
 
                 val payload = JSONObject().apply {
                     put("name", userName)
@@ -129,12 +149,21 @@ class MapViewModel(
         }
     }
 
+
+    // Process incoming presence data. Filter by family members.
     private fun handleMemberPresenceUpdated(payload: JSONObject?) {
         payload ?: return
 
         try {
             val userId = payload.optInt("userId", -1)
             if (userId == -1) return
+            
+            // Filter: Only show users in my family whitelist
+            val currentUserProfile = uiState.value.currentUserProfile
+            val isMe = userId == currentUserProfile?.id
+            val isFamily = userId in uiState.value.myFamilyMemberIds
+
+            if (!isMe && !isFamily) return
 
             val userOnMap = UserOnMap(
                 userId = userId,
@@ -163,6 +192,9 @@ class MapViewModel(
         }
     }
 
+    /**
+     * Remove users who haven't updated their location in 5 seconds.
+     */
     fun removeOfflineUsers() {
         val now = System.currentTimeMillis()
         val offlineTimeout = 5000L
@@ -176,18 +208,6 @@ class MapViewModel(
         }
     }
 
-    fun disconnectWebSocket() {
-        isLocationSending = false
-        webSocketRepository.disconnect()
-        updateState {
-            copy(
-                meta = UiResourceMeta(),
-                isSocketConnected = false,
-                otherUsers = emptyMap(),
-            )
-        }
-    }
-
     fun updateSearchQuery(query: String) {
         updateState {
             copy(searchQuery = query)
@@ -196,11 +216,13 @@ class MapViewModel(
 
     fun getFilteredUsers(): Map<Int, UserOnMap> {
         val query = uiState.value.searchQuery.trim()
+        val currentUsers = uiState.value.otherUsers
+        
         if (query.isEmpty()) {
-            return uiState.value.otherUsers
+            return currentUsers
         }
 
-        return uiState.value.otherUsers.filter { (_, user) ->
+        return currentUsers.filter { (_, user) ->
             user.fullName.contains(query, ignoreCase = true) ||
             user.email.contains(query, ignoreCase = true)
         }
@@ -208,5 +230,11 @@ class MapViewModel(
 
     override fun refresh() {
         loadCurrentUserProfile()
+        loadFamilyMembers()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        isLocationSending = false
     }
 }

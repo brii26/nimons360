@@ -22,11 +22,10 @@
         android:id="@+id/iv_arrow"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="52dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
-        android:src="@drawable/ic_navigation_arrow"
-         />
+        android:paddingBottom="52dp"
+        android:src="@drawable/ic_navigation_arrow" />
 
     <com.tit.nimonsapp.ui.common.AvatarView
         android:id="@+id/marker_avatar"

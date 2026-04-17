@@ -14,6 +14,7 @@ data class MapUiState(
     val selectedUserId: Int? = null,
     val searchQuery: String = "",
     val currentUserProfile: GetMeResponseDto? = null,
+    val myFamilyMemberIds: Set<Int> = emptySet(),
 ) : RefreshableStatefulUi
 
 data class UserOnMap(
