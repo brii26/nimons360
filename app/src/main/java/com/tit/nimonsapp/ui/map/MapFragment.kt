@@ -25,7 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.maplibre.android.MapLibre
-import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.MapLibreMap
@@ -33,6 +33,7 @@ import org.maplibre.android.maps.OnMapReadyCallback
 import org.maplibre.android.maps.Style
 import org.maplibre.android.plugins.markerview.MarkerView
 import org.maplibre.android.plugins.markerview.MarkerViewManager
+import java.util.concurrent.TimeUnit
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -91,7 +92,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         locationRepository = LocationRepository(requireContext())
         locationRepository.initialize()
 
-        val webSocketManager = WebSocketManager(OkHttpClient.Builder().build())
+        // Menambahkan pingInterval untuk menjaga koneksi WebSocket tetap hidup
+        val client = OkHttpClient.Builder()
+            .pingInterval(30, TimeUnit.SECONDS)
+            .build()
+
+        val webSocketManager = WebSocketManager(client)
         webSocketRepository = WebSocketRepository(webSocketManager)
 
         val token = getToken()
@@ -108,9 +114,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         markerViewManager = MarkerViewManager(mapView, map)
 
         map.setStyle(
-            Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")
+            Style.Builder().fromUri("https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json")
         )
+        
+        map.uiSettings.isLogoEnabled = false
+        map.uiSettings.isAttributionEnabled = true
     }
+
     private fun requestLocationPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -165,27 +175,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val position = LatLng(location.latitude, location.longitude)
 
         if (currentUserMarker == null) {
-            // Buat UI kita dan simpan ke variabel referensi
             currentUserMarkerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.CURRENT_USER).apply {
                 setMarkerData("M")
                 setMarkerRotation(location.rotation.toFloat())
             }
 
-            // Bungkus ke MarkerView MapLibre dan tampilkan ke peta
             currentUserMarker = MarkerView(position, currentUserMarkerView!!).apply {
                 markerViewManager.addMarker(this)
             }
+            
+            // Animate camera hanya saat marker pertama kali dibuat (first location lock)
+            mapLibreMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15.0))
         } else {
-            // Update posisi koordinat di amplop MapLibre
             currentUserMarker?.setLatLng(position)
-
             currentUserMarkerView?.setMarkerRotation(location.rotation.toFloat())
         }
-
-        mapLibreMap.cameraPosition = CameraPosition.Builder()
-            .target(position)
-            .zoom(15.0)
-            .build()
     }
 
     private fun observeViewModel() {
@@ -211,7 +215,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateOtherUsersMarkers(users: Map<Int, UserOnMap>) {
-        // guard lateinit
         if (!::markerViewManager.isInitialized) return
 
         val currentIds = markers.keys.toList()
@@ -233,7 +236,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val markerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER)
                 markerView.setMarkerData(
                     user.fullName.take(1).uppercase(),
-                    ContextCompat.getColor(requireContext(), R.color.colorPrimary),
+                    ContextCompat.getColor(requireContext(), R.color.blue),
                 )
 
                 val marker = MarkerView(position, markerView).apply {
@@ -272,7 +275,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    // nanti pake token asli dari store
     private fun getToken(): String {
         return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiMTM1MjIwODRAc3RkLnN0ZWkuaXRiLmFjLmlkIiwiaWF0IjoxNzc2MzQ1NjMyLCJleHAiOjE3NzY5NTA0MzJ9.oP1HhfTm6rSXgRD8my96PQqtRWzL1ytaPf5NEwa-QKY"
     }
