@@ -84,4 +84,5 @@ dependencies {
     implementation(libs.androidx.compose.ui.viewbinding)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.icons.extended)
 }
