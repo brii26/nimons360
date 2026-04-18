@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +33,18 @@ class HomeFragment : Fragment() {
                     },
                     onGoToCreateFamily = {
                         findNavController().navigate(R.id.action_homeFragment_to_createFamilyFragment)
+                    },
+                    onGoToFamilyDetail = { familyId ->
+                        findNavController().navigate(
+                            R.id.action_homeFragment_to_familyDetailFragment,
+                            bundleOf("familyId" to familyId),
+                        )
+                    },
+                    onJoinFamily = { familyId ->
+                        findNavController().navigate(
+                            R.id.action_homeFragment_to_familyDetailFragment,
+                            bundleOf("familyId" to familyId),
+                        )
                     },
                 )
             }

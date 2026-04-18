@@ -41,6 +41,8 @@ fun homeScreen(
     onRefresh: () -> Unit,
     onGoToProfile: () -> Unit,
     onGoToCreateFamily: () -> Unit,
+    onGoToFamilyDetail: (Int) -> Unit,
+    onJoinFamily: (Int) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -81,7 +83,7 @@ fun homeScreen(
                     emptyCard("You are not in any family yet.")
                 } else {
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                        items(state.myFamilies) { myFamilyCard(family = it) }
+                        items(state.myFamilies) { myFamilyCard(family = it, onClick = { onGoToFamilyDetail(it.id) }) }
                     }
                 }
             }
@@ -97,7 +99,11 @@ fun homeScreen(
                 } else if (state.discoverFamilies.isEmpty()) {
                     emptyCard("No families to discover right now.")
                 } else {
-                    discoverFamiliesCard(families = state.discoverFamilies)
+                    discoverFamiliesCard(
+                        families = state.discoverFamilies,
+                        onFamilyClick = onGoToFamilyDetail,
+                        onJoinClick = onJoinFamily,
+                    )
                 }
             }
 

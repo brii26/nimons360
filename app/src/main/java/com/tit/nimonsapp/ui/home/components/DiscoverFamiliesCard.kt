@@ -1,5 +1,6 @@
 package com.tit.nimonsapp.ui.home.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +24,11 @@ import com.tit.nimonsapp.data.network.GetDiscoverFamiliesResponseDto
 import com.tit.nimonsapp.ui.common.iconImage
 
 @Composable
-fun discoverFamiliesCard(families: List<GetDiscoverFamiliesResponseDto>) {
+fun discoverFamiliesCard(
+    families: List<GetDiscoverFamiliesResponseDto>,
+    onFamilyClick: (Int) -> Unit,
+    onJoinClick: (Int) -> Unit,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
@@ -32,7 +37,7 @@ fun discoverFamiliesCard(families: List<GetDiscoverFamiliesResponseDto>) {
     ) {
         Column {
             families.forEachIndexed { index, family ->
-                discoverFamilyRow(family = family)
+                discoverFamilyRow(family = family, onFamilyClick = onFamilyClick, onJoinClick = onJoinClick)
                 if (index != families.lastIndex) {
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.outlineVariant,
@@ -45,9 +50,16 @@ fun discoverFamiliesCard(families: List<GetDiscoverFamiliesResponseDto>) {
 }
 
 @Composable
-private fun discoverFamilyRow(family: GetDiscoverFamiliesResponseDto) {
+private fun discoverFamilyRow(
+    family: GetDiscoverFamiliesResponseDto,
+    onFamilyClick: (Int) -> Unit,
+    onJoinClick: (Int) -> Unit,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 18.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onFamilyClick(family.id) }
+            .padding(horizontal = 16.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         iconImage(iconUrl = family.iconUrl, size = 52.dp)
@@ -75,6 +87,7 @@ private fun discoverFamilyRow(family: GetDiscoverFamiliesResponseDto) {
         Spacer(modifier = Modifier.width(10.dp))
 
         Surface(
+            onClick = { onJoinClick(family.id) },
             shape = RoundedCornerShape(999.dp),
             color = MaterialTheme.colorScheme.primaryContainer,
         ) {

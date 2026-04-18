@@ -20,8 +20,9 @@ import com.tit.nimonsapp.data.network.GetMyFamiliesResponseDto
 import com.tit.nimonsapp.ui.common.iconImage
 
 @Composable
-fun myFamilyCard(family: GetMyFamiliesResponseDto) {
+fun myFamilyCard(family: GetMyFamiliesResponseDto, onClick: () -> Unit) {
     Card(
+        onClick = onClick,
         modifier = Modifier.width(176.dp).aspectRatio(0.82f),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
