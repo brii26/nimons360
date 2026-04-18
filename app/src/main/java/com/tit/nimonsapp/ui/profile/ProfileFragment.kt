@@ -15,8 +15,9 @@ import com.tit.nimonsapp.databinding.FragmentProfileBinding
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
-    private var _binding: FragmentProfileBinding? = null
-    private val binding get() = _binding!!
+    private var binding: FragmentProfileBinding? = null
+
+    private fun requireBinding(): FragmentProfileBinding = requireNotNull(binding)
 
     private val viewModel: ProfileViewModel by viewModels()
 
@@ -25,24 +26,27 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        return binding.root
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return requireBinding().root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.loadProfile()
 
-        binding.editAvatarButton.setOnClickListener {
+        requireBinding().editAvatarButton.setOnClickListener {
             EditNameBottomSheetFragment().show(childFragmentManager, null)
         }
 
-        binding.backHomeButton.setOnClickListener {
+        requireBinding().backHomeButton.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_homeFragment)
         }
 
-        binding.logoutButton.setOnClickListener {
+        requireBinding().logoutButton.setOnClickListener {
             SignOutModalFragment(onConfirm = { viewModel.logout() })
                 .show(childFragmentManager, null)
         }
@@ -51,9 +55,9 @@ class ProfileFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     state.profile?.let { profile ->
-                        binding.profileName.text = profile.fullName
-                        binding.profileEmail.text = profile.email
-                        binding.profileAvatar.setLetter(
+                        requireBinding().profileName.text = profile.fullName
+                        requireBinding().profileEmail.text = profile.email
+                        requireBinding().profileAvatar.setLetter(
                             profile.fullName.firstOrNull()?.toString() ?: "?",
                             requireContext().getColor(android.R.color.black),
                         )
@@ -70,6 +74,6 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 }

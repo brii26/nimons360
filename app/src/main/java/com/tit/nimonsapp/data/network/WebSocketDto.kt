@@ -6,22 +6,21 @@ import kotlinx.serialization.Serializable
 data class PingDto(
     val type: String = "ping",
     val payload: Map<String, String> = emptyMap(),
-    val timestamp: String
+    val timestamp: String,
 )
 
 @Serializable
 data class PongDto(
     val type: String = "pong",
     val payload: Map<String, String> = emptyMap(),
-    val timestamp: String
+    val timestamp: String,
 )
-
 
 @Serializable
 data class UpdatePresenceDto(
     val type: String = "update_presence",
     val payload: PresencePayload,
-    val timestamp: String
+    val timestamp: String,
 )
 
 @Serializable
@@ -33,16 +32,15 @@ data class PresencePayload(
     val batteryLevel: Int,
     val isCharging: Boolean,
     val internetStatus: String,
-    val metadata: Map<String, String> = emptyMap()
+    val metadata: Map<String, String> = emptyMap(),
 )
 
 @Serializable
 data class MemberPresenceUpdatedDto(
     val type: String = "member_presence_updated",
     val payload: MemberPresencePayload,
-    val timestamp: String
+    val timestamp: String,
 )
-
 
 @Serializable
 data class MemberPresencePayload(
@@ -55,5 +53,5 @@ data class MemberPresencePayload(
     val batteryLevel: Int,
     val isCharging: Boolean,
     val internetStatus: String,
-    val metadata: Map<String, String> = emptyMap()
+    val metadata: Map<String, String> = emptyMap(),
 )

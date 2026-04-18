@@ -9,9 +9,8 @@ import com.tit.nimonsapp.databinding.ViewIconPickerItemBinding
 
 class IconPickerAdapter(
     private val icons: List<String>,
-    private val onIconSelected: (String) -> Unit
+    private val onIconSelected: (String) -> Unit,
 ) : RecyclerView.Adapter<IconPickerAdapter.ViewHolder>() {
-
     private var selectedUrl: String = icons.firstOrNull() ?: ""
 
     fun setSelected(url: String) {
@@ -19,31 +18,36 @@ class IconPickerAdapter(
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder =
+        ViewHolder(
             ViewIconPickerItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
-    }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         holder.bind(icons[position])
     }
 
     override fun getItemCount() = icons.size
 
-    inner class ViewHolder(private val binding: ViewIconPickerItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
+    inner class ViewHolder(
+        private val binding: ViewIconPickerItemBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(url: String) {
             binding.ivIconItem.load(url)
-            
+
             // Highlight if selected
             binding.root.isSelected = url == selectedUrl
-            
+
             binding.root.setOnClickListener {
                 onIconSelected(url)
                 setSelected(url)

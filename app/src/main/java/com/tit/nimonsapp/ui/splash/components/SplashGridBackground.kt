@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import com.tit.nimonsapp.R
 
 @Composable
-fun SplashGridBackground(
+fun splashGridBackground(
     offset: Float,
     modifier: Modifier = Modifier,
 ) {
@@ -23,11 +23,23 @@ fun SplashGridBackground(
 
         for (i in -2..(size.width / spacing).toInt() + 2) {
             val x = i * spacing + shifted
-            drawLine(gridColor, Offset(x, 0f), Offset(x, size.height), strokeWidth.toPx(), alpha = alpha)
+            drawLine(
+                color = gridColor,
+                start = Offset(x, 0f),
+                end = Offset(x, size.height),
+                strokeWidth = strokeWidth.toPx(),
+                alpha = alpha,
+            )
         }
         for (i in -2..(size.height / spacing).toInt() + 2) {
             val y = i * spacing + shifted
-            drawLine(gridColor, Offset(0f, y), Offset(size.width, y), strokeWidth.toPx(), alpha = alpha)
+            drawLine(
+                color = gridColor,
+                start = Offset(0f, y),
+                end = Offset(size.width, y),
+                strokeWidth = strokeWidth.toPx(),
+                alpha = alpha,
+            )
         }
     }
 }

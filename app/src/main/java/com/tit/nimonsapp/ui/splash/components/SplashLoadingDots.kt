@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.tit.nimonsapp.R
 
 @Composable
-fun SplashLoadingDots(
+fun splashLoadingDots(
     dot1Alpha: Float,
     dot2Alpha: Float,
     dot3Alpha: Float,
@@ -30,10 +30,11 @@ fun SplashLoadingDots(
     ) {
         listOf(dot1Alpha, dot2Alpha, dot3Alpha).forEach { alpha ->
             Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .clip(CircleShape)
-                    .background(dotColor.copy(alpha = alpha)),
+                modifier =
+                    Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(dotColor.copy(alpha = alpha)),
             )
         }
     }

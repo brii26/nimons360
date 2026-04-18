@@ -3,56 +3,40 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
-	style="@style/ScrollViewDefault"
-	android:background="@color/white"
-	android:isScrollContainer="true"
-	android.fillViewport="true" >
+	style="@style/ScrollViewDefault" android:background="@color/white"
+	android:isScrollContainer="true" android.fillViewport="true">
 
-	<LinearLayout 
-		style="@style/Login.Container" 
-		android:focusable="true"
-		android:focusableInTouchMode="true"
-	>
+	<LinearLayout style="@style/Login.Container"
+		android:focusable="true" android:focusableInTouchMode="true">
 
-		<LinearLayout
-			style="@style/Login.Header" >
-			<ImageView
-				android:id="@+id/app_logo"
-				android:src="@drawable/ic_app_border"
-				android:layout_width="128dp"
-				android:layout_height="128dp"/>
+		<LinearLayout style="@style/Login.Header">
+			<ImageView android:id="@+id/app_logo"
+				android:src="@drawable/ic_app_border" android:layout_width="128dp"
+				android:layout_height="128dp" />
 
 			<TextView android:id="@+id/login_title"
-				style="@style/Login.Title"
-				android:text="@string/login_title" />
+				style="@style/Login.Title" android:text="@string/login_title" />
 
 			<TextView android:id="@+id/login_subtitle"
-				style="@style/Login.Subtitle"
-				android:text="@string/login_subtitle" />
+				style="@style/Login.Subtitle" android:text="@string/login_subtitle" />
 		</LinearLayout>
 
 		<com.tit.nimonsapp.ui.common.InputFieldView
-			android:id="@+id/email_input"
-			style="@style/InputField"
-			android:layout_marginTop="33dp"
-			app:leftIcon="@drawable/ic_mail"
+			android:id="@+id/email_input" style="@style/InputField"
+			android:layout_marginTop="33dp" app:leftIcon="@drawable/ic_mail"
 			app:placeholderText="@string/login_email_placeholder" />
 
 		<com.tit.nimonsapp.ui.common.InputFieldView
-			android:id="@+id/password_input"
-			style="@style/InputField"
-			android:inputType="textPassword"
-			app:leftIcon="@drawable/ic_lock"
+			android:id="@+id/password_input" style="@style/InputField"
+			android:inputType="textPassword" app:leftIcon="@drawable/ic_lock"
 			app:placeholderText="@string/login_password_placeholder"
 			app:rightActionIcon="@drawable/ic_show" />
 
 		<ProgressBar android:id="@+id/loading_indicator"
-			style="@style/Login.LoadingIndicator"
-			tools:visibility="visible" />
+			style="@style/Login.LoadingIndicator" tools:visibility="visible" />
 
 		<com.tit.nimonsapp.ui.common.ButtonView
-			android:id="@+id/login_button"
-			style="@style/Button.Filled"
+			android:id="@+id/login_button" style="@style/Button.Filled"
 			android:text="@string/login_button" />
 
 	</LinearLayout>

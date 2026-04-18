@@ -14,21 +14,29 @@ class FamiliesAdapter(
     private val onPinClick: (Int) -> Unit,
     private val onItemClick: (Int) -> Unit,
 ) : ListAdapter<FamilyItem, FamiliesAdapter.ViewHolder>(DiffCallback) {
-
     init {
         setHasStableIds(true)
     }
 
     override fun getItemId(position: Int): Long = getItem(position).family.id.toLong()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
-        ViewHolder(ItemFamilyBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): ViewHolder = ViewHolder(ItemFamilyBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: List<Any>) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int,
+        payloads: List<Any>,
+    ) {
         if (payloads.isEmpty()) {
             holder.bind(getItem(position))
         } else {
@@ -36,9 +44,9 @@ class FamiliesAdapter(
         }
     }
 
-    inner class ViewHolder(private val binding: ItemFamilyBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
+    inner class ViewHolder(
+        private val binding: ItemFamilyBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: FamilyItem) {
             binding.familyName.text = item.family.name
             binding.ivFamilyIcon.load(item.family.iconUrl) {
@@ -62,13 +70,19 @@ class FamiliesAdapter(
     companion object DiffCallback : DiffUtil.ItemCallback<FamilyItem>() {
         private const val PAYLOAD_PIN = "pin"
 
-        override fun areItemsTheSame(oldItem: FamilyItem, newItem: FamilyItem): Boolean =
-            oldItem.family.id == newItem.family.id
+        override fun areItemsTheSame(
+            oldItem: FamilyItem,
+            newItem: FamilyItem,
+        ): Boolean = oldItem.family.id == newItem.family.id
 
-        override fun areContentsTheSame(oldItem: FamilyItem, newItem: FamilyItem): Boolean =
-            oldItem == newItem
+        override fun areContentsTheSame(
+            oldItem: FamilyItem,
+            newItem: FamilyItem,
+        ): Boolean = oldItem == newItem
 
-        override fun getChangePayload(oldItem: FamilyItem, newItem: FamilyItem): Any? =
-            if (oldItem.family == newItem.family && oldItem.isPinned != newItem.isPinned) PAYLOAD_PIN else null
+        override fun getChangePayload(
+            oldItem: FamilyItem,
+            newItem: FamilyItem,
+        ): Any? = if (oldItem.family == newItem.family && oldItem.isPinned != newItem.isPinned) PAYLOAD_PIN else null
     }
 }

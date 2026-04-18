@@ -1,36 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="72dp"
-    android:layout_height="72dp"
-    android:clipChildren="false">
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="72dp" android:layout_height="72dp"
+	android:clipChildren="false">
 
-    <View
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_gravity="center"
-        android:background="@drawable/bg_current_user_marker_with_arrow" />
+	<View android:layout_width="44dp" android:layout_height="44dp"
+		android:layout_gravity="center"
+		android:background="@drawable/bg_current_user_marker_with_arrow" />
 
-    <ImageView
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_person"
-        app:tint="@android:color/white" />
+	<ImageView android:layout_width="24dp"
+		android:layout_height="24dp" android:layout_gravity="center"
+		android:src="@drawable/ic_person" app:tint="@android:color/white" />
 
-    <ImageView
-        android:id="@+id/iv_arrow"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingBottom="52dp"
-        android:src="@drawable/ic_navigation_arrow" />
+	<ImageView android:id="@+id/iv_arrow"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" android:paddingLeft="24dp"
+		android:paddingRight="24dp" android:paddingBottom="52dp"
+		android:src="@drawable/ic_navigation_arrow" />
 
-    <com.tit.nimonsapp.ui.common.AvatarView
-        android:id="@+id/marker_avatar"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone" />
+	<com.tit.nimonsapp.ui.common.AvatarView
+		android:id="@+id/marker_avatar" android:layout_width="0dp"
+		android:layout_height="0dp" android:visibility="gone" />
 
 </FrameLayout>

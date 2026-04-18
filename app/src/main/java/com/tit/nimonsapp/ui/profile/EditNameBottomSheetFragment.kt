@@ -12,27 +12,36 @@ import com.tit.nimonsapp.ui.common.AppBottomSheetFragment
 import kotlinx.coroutines.launch
 
 class EditNameBottomSheetFragment : AppBottomSheetFragment(R.layout.content_edit_name) {
+    private var binding: ContentEditNameBinding? = null
 
-    private var _binding: ContentEditNameBinding? = null
-    private val binding get() = _binding!!
+    private fun requireBinding(): ContentEditNameBinding = requireNotNull(binding)
 
     private val viewModel: ProfileViewModel by viewModels(ownerProducer = { requireParentFragment() })
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         val contentContainer = view.findViewById<android.widget.FrameLayout>(R.id.bottom_sheet_content)
-        _binding = ContentEditNameBinding.bind(contentContainer.getChildAt(0))
+        binding = ContentEditNameBinding.bind(contentContainer.getChildAt(0))
 
-        val currentName = viewModel.uiState.value.profile?.fullName
+        val currentName =
+            viewModel.uiState.value.profile
+                ?.fullName
         if (!currentName.isNullOrEmpty()) {
-            binding.inputDisplayName.text?.append(currentName)
+            requireBinding().inputDisplayName.text?.append(currentName)
         }
 
         var saveInProgress = false
 
-        binding.btnCancel.setOnClickListener { dismiss() }
-        binding.btnSave.setOnClickListener {
-            val name = binding.inputDisplayName.text?.toString().orEmpty()
+        requireBinding().btnCancel.setOnClickListener { dismiss() }
+        requireBinding().btnSave.setOnClickListener {
+            val name =
+                requireBinding()
+                    .inputDisplayName.text
+                    ?.toString()
+                    .orEmpty()
             saveInProgress = true
             viewModel.updateFullName(name)
         }
@@ -41,7 +50,7 @@ class EditNameBottomSheetFragment : AppBottomSheetFragment(R.layout.content_edit
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     val isLoading = state.meta.isLoading
-                    binding.btnSave.isEnabled = !isLoading
+                    requireBinding().btnSave.isEnabled = !isLoading
                     if (saveInProgress && !isLoading && state.meta.errorMessage == null) {
                         dismiss()
                     }
@@ -52,6 +61,6 @@ class EditNameBottomSheetFragment : AppBottomSheetFragment(R.layout.content_edit
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 }

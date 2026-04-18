@@ -24,11 +24,12 @@ fun smallAvatar(
     textColor: Color = Color.White,
 ) {
     Box(
-        modifier = Modifier
-            .offset { IntOffset(x = -overlapIndex * 12, y = 0) }
-            .size(28.dp)
-            .clip(CircleShape)
-            .background(color),
+        modifier =
+            Modifier
+                .offset { IntOffset(x = -overlapIndex * 12, y = 0) }
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(color),
         contentAlignment = Alignment.Center,
     ) {
         Text(

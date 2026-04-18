@@ -15,13 +15,12 @@
 
 		<action
 			android:id="@+id/action_splashFragment_to_loginFragment"
-			app:destination="@id/loginFragment" app:popUpTo="@id/navigation_graphs"
-			app:popUpToInclusive="true" />
+			app:destination="@id/loginFragment"
+			app:popUpTo="@id/navigation_graphs" app:popUpToInclusive="true" />
 
-		<action
-			android:id="@+id/action_splashFragment_to_homeFragment"
-			app:destination="@id/homeFragment" app:popUpTo="@id/navigation_graphs"
-			app:popUpToInclusive="true" />
+		<action android:id="@+id/action_splashFragment_to_homeFragment"
+			app:destination="@id/homeFragment"
+			app:popUpTo="@id/navigation_graphs" app:popUpToInclusive="true" />
 	</fragment>
 
 	<!-- login route -->
@@ -95,8 +94,8 @@
 
 		<action
 			android:id="@+id/action_profileFragment_to_loginFragment"
-			app:destination="@id/loginFragment" app:popUpTo="@id/navigation_graphs"
-			app:popUpToInclusive="true" />
+			app:destination="@id/loginFragment"
+			app:popUpTo="@id/navigation_graphs" app:popUpToInclusive="true" />
 	</fragment>
 
 	<!-- create family route -->

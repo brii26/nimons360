@@ -23,10 +23,11 @@ fun iconImage(
     size: Dp = 56.dp,
 ) {
     Box(
-        modifier = Modifier
-            .size(size)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+        modifier =
+            Modifier
+                .size(size)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
     ) {
         AsyncImage(
@@ -35,7 +36,7 @@ fun iconImage(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit,
             placeholder = painterResource(R.drawable.ic_app),
-            error = painterResource(R.drawable.ic_app)
+            error = painterResource(R.drawable.ic_app),
         )
     }
 }

@@ -1,6 +1,9 @@
 <resources>
 	<string name="app_name">NimonsApp</string>
-	<string name="login_title">Nimons<font color="#4CAF50">360</font></string>
+	<string name="login_title">
+		Nimons
+		<font color="#4CAF50">360</font>
+	</string>
 	<string name="login_subtitle">Stay connected with those who matter.</string>
 	<string name="login_email_placeholder">Email</string>
 	<string name="login_password_placeholder">Password</string>
@@ -9,5 +12,5 @@
 	<!-- Splash Screen -->
 	<string name="splash_app_name_prefix">Nimons</string>
 	<string name="splash_app_name_suffix">360</string>
-<string name="splash_pin_content_description">Map pin</string>
+	<string name="splash_pin_content_description">Map pin</string>
 </resources>

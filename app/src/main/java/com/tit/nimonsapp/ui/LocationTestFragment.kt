@@ -17,7 +17,6 @@ import com.tit.nimonsapp.data.repository.LocationRepository
 import kotlinx.coroutines.launch
 
 class LocationTestFragment : Fragment() {
-
     private lateinit var locationRepo: LocationRepository
 
     private lateinit var tvLat: TextView
@@ -29,24 +28,26 @@ class LocationTestFragment : Fragment() {
     private lateinit var btnStart: Button
     private lateinit var btnStop: Button
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val fineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
-        if (fineLocation) {
-            startLocationUpdatesAndObserve()
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions(),
+        ) { permissions ->
+            val fineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            if (fineLocation) {
+                startLocationUpdatesAndObserve()
+            }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_location_test, container, false)
-    }
+        savedInstanceState: Bundle?,
+    ): View? = inflater.inflate(R.layout.fragment_location_test, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         locationRepo = LocationRepository(requireContext())
@@ -73,7 +74,7 @@ class LocationTestFragment : Fragment() {
     private fun checkAndRequestPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             startLocationUpdatesAndObserve()
@@ -81,8 +82,8 @@ class LocationTestFragment : Fragment() {
             requestPermissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
             )
         }
     }

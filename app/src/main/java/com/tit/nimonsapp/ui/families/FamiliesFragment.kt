@@ -22,8 +22,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class FamiliesFragment : Fragment() {
-    private var _binding: FragmentFamiliesBinding? = null
-    private val binding get() = _binding!!
+    private var binding: FragmentFamiliesBinding? = null
+
+    private fun requireBinding(): FragmentFamiliesBinding = requireNotNull(binding)
 
     private val viewModel: FamiliesViewModel by viewModels()
 
@@ -37,11 +38,14 @@ class FamiliesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentFamiliesBinding.inflate(inflater, container, false)
-        return binding.root
+        binding = FragmentFamiliesBinding.inflate(inflater, container, false)
+        return requireBinding().root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         setupAdapters()
@@ -52,16 +56,19 @@ class FamiliesFragment : Fragment() {
     }
 
     private fun setupAdapters() {
+        val binding = requireBinding()
         val sharedPool = RecyclerView.RecycledViewPool()
 
-        pinnedAdapter = FamiliesAdapter(
-            onPinClick = { id -> viewModel.togglePinned(id) },
-            onItemClick = { id -> navigateToDetail(id) },
-        )
-        allFamiliesAdapter = FamiliesAdapter(
-            onPinClick = { id -> viewModel.togglePinned(id) },
-            onItemClick = { id -> navigateToDetail(id) },
-        )
+        pinnedAdapter =
+            FamiliesAdapter(
+                onPinClick = { id -> viewModel.togglePinned(id) },
+                onItemClick = { id -> navigateToDetail(id) },
+            )
+        allFamiliesAdapter =
+            FamiliesAdapter(
+                onPinClick = { id -> viewModel.togglePinned(id) },
+                onItemClick = { id -> navigateToDetail(id) },
+            )
 
         binding.pinnedRecycler.apply {
             layoutManager = LinearLayoutManager(context)
@@ -69,6 +76,7 @@ class FamiliesFragment : Fragment() {
             setRecycledViewPool(sharedPool)
             setHasFixedSize(false)
         }
+
         binding.allFamiliesRecycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = allFamiliesAdapter
@@ -85,19 +93,23 @@ class FamiliesFragment : Fragment() {
     }
 
     private fun setupListeners() {
+        val binding = requireBinding()
+
         binding.searchInput.addTextChangedListener { text ->
             searchDebounceJob?.cancel()
-            searchDebounceJob = viewLifecycleOwner.lifecycleScope.launch {
-                delay(200)
-                viewModel.updateSearchQuery(text?.toString() ?: "")
-            }
+            searchDebounceJob =
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(200)
+                    viewModel.updateSearchQuery(text?.toString() ?: "")
+                }
         }
 
         binding.filterChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            val filter = when (checkedIds.firstOrNull()) {
-                R.id.chip_my_families -> FamiliesFilter.MY_FAMILIES
-                else -> FamiliesFilter.ALL
-            }
+            val filter =
+                when (checkedIds.firstOrNull()) {
+                    R.id.chip_my_families -> FamiliesFilter.MY_FAMILIES
+                    else -> FamiliesFilter.ALL
+                }
             viewModel.updateFilter(filter)
         }
 
@@ -105,7 +117,6 @@ class FamiliesFragment : Fragment() {
             findNavController().navigate(R.id.action_familiesFragment_to_createFamilyFragment)
         }
 
-        // Trigger loadMore pas scroll kebawah
         binding.nestedScrollView.setOnScrollChangeListener(
             NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
                 val contentHeight = v.getChildAt(0).measuredHeight
@@ -121,7 +132,9 @@ class FamiliesFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
+                    val binding = requireBinding()
                     val pinned = state.pinnedItems
+
                     pinnedAdapter.submitList(pinned)
                     allFamiliesAdapter.submitList(state.pagedItems)
 
@@ -139,6 +152,6 @@ class FamiliesFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         searchDebounceJob?.cancel()
-        _binding = null
+        binding = null
     }
 }

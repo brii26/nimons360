@@ -1,23 +1,23 @@
 <resources>
 
-    <declare-styleable name="InputField">
-        <attr name="leftIcon" format="reference" />
-        <attr name="placeholderText" format="string" />
-        <attr name="rightActionText" format="string" />
+	<declare-styleable name="InputField">
+		<attr name="leftIcon" format="reference" />
+		<attr name="placeholderText" format="string" />
+		<attr name="rightActionText" format="string" />
 		<attr name="rightActionIcon" format="reference" />
-		<attr name="android:inputType"/>
-        <attr name="labelText" format="string" />
-        <attr name="clearable" format="boolean" />
-    </declare-styleable>
+		<attr name="android:inputType" />
+		<attr name="labelText" format="string" />
+		<attr name="clearable" format="boolean" />
+	</declare-styleable>
 
 
-    <declare-styleable name="AvatarView">
-        <attr name="avatarShape" format="enum">
-            <enum name="circle" value="0" />
-            <enum name="rounded_square" value="1" />
-        </attr>
-        <attr name="avatarText" format="string" />
-        <attr name="avatarBgColor" format="color|reference" />
-    </declare-styleable>
+	<declare-styleable name="AvatarView">
+		<attr name="avatarShape" format="enum">
+			<enum name="circle" value="0" />
+			<enum name="rounded_square" value="1" />
+		</attr>
+		<attr name="avatarText" format="string" />
+		<attr name="avatarBgColor" format="color|reference" />
+	</declare-styleable>
 
 </resources>

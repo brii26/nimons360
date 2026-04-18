@@ -3,20 +3,22 @@ package com.tit.nimonsapp.data.network
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import org.json.JSONObject
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
-class WebSocketManager(private val client: OkHttpClient) {
+class WebSocketManager(
+    private val client: OkHttpClient,
+) {
     private var webSocket: WebSocket? = null
     private val json = Json { ignoreUnknownKeys = true }
     private val _messages = Channel<WebSocketMessage>(Channel.UNLIMITED)
@@ -24,7 +26,10 @@ class WebSocketManager(private val client: OkHttpClient) {
 
     private val onlineUsers = ConcurrentHashMap<Int, MemberPresencePayload>()
 
-    fun connect(url: String, token: String? = null) {
+    fun connect(
+        url: String,
+        token: String? = null,
+    ) {
         val requestBuilder = Request.Builder().url(url)
         token?.let {
             requestBuilder.addHeader("Authorization", "Bearer $it")
@@ -34,9 +39,12 @@ class WebSocketManager(private val client: OkHttpClient) {
         webSocket = client.newWebSocket(request, createWebSocketListener())
     }
 
-    private fun createWebSocketListener(): WebSocketListener {
-        return object : WebSocketListener() {
-            override fun onOpen(ws: WebSocket, response: okhttp3.Response) {
+    private fun createWebSocketListener(): WebSocketListener =
+        object : WebSocketListener() {
+            override fun onOpen(
+                ws: WebSocket,
+                response: okhttp3.Response,
+            ) {
                 _messages.trySend(
                     WebSocketMessage(
                         type = WebSocketMessageType.CONNECTED,
@@ -46,7 +54,10 @@ class WebSocketManager(private val client: OkHttpClient) {
                 )
             }
 
-            override fun onMessage(ws: WebSocket, text: String) {
+            override fun onMessage(
+                ws: WebSocket,
+                text: String,
+            ) {
                 try {
                     val jsonObject = org.json.JSONObject(text)
                     val type = jsonObject.optString("type", "")
@@ -61,6 +72,7 @@ class WebSocketManager(private val client: OkHttpClient) {
                                 ),
                             )
                         }
+
                         "member_presence_updated" -> {
                             val payload = jsonObject.optJSONObject("payload")
                             _messages.trySend(
@@ -83,7 +95,11 @@ class WebSocketManager(private val client: OkHttpClient) {
                 }
             }
 
-            override fun onClosing(ws: WebSocket, code: Int, reason: String) {
+            override fun onClosing(
+                ws: WebSocket,
+                code: Int,
+                reason: String,
+            ) {
                 _messages.trySend(
                     WebSocketMessage(
                         type = WebSocketMessageType.DISCONNECTED,
@@ -107,13 +123,13 @@ class WebSocketManager(private val client: OkHttpClient) {
                 )
             }
         }
-    }
 
     fun sendPresenceUpdate(payload: PresencePayload) {
-        val updateDto = UpdatePresenceDto(
-            payload = payload,
-            timestamp = Instant.now().toString()
-        )
+        val updateDto =
+            UpdatePresenceDto(
+                payload = payload,
+                timestamp = Instant.now().toString(),
+            )
         webSocket?.send(json.encodeToString(updateDto))
     }
 

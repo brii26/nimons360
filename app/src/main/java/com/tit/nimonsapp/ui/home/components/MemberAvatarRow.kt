@@ -43,17 +43,19 @@ fun memberAvatarRow(
     }
 }
 
-internal val avatarColors = listOf(
-    Color(0xFF0097A7), // avatar_1
-    Color(0xFFD83A34),
-    Color(0xFF43A047),
-    Color(0xFFF57C00),
-    Color(0xFFE65100),
-    Color(0xFFC2185B),
-)
+internal val avatarColors =
+    listOf(
+        Color(0xFF0097A7), // avatar_1
+        Color(0xFFD83A34),
+        Color(0xFF43A047),
+        Color(0xFFF57C00),
+        Color(0xFFE65100),
+        Color(0xFFC2185B),
+    )
 
 internal fun initialsFromName(name: String): String =
-    name.trim()
+    name
+        .trim()
         .split("\\s+".toRegex())
         .filter { it.isNotBlank() }
         .take(1)

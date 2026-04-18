@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-	<style name="Base.Theme.NimonsApp" parent="Theme.Material3.DayNight.NoActionBar">
+	<style name="Base.Theme.NimonsApp"
+		parent="Theme.Material3.DayNight.NoActionBar">
 		<item name="android:windowBackground">?attr/colorSurface</item>
 		<item name="android:fontFamily">sans-serif</item>
 		<item name="colorPrimary">@color/nimons_green</item>
@@ -11,6 +12,6 @@
 
 	<style name="Theme.NimonsApp.Splash" parent="Theme.SplashScreen">
 		<item name="windowSplashScreenBackground">@color/white</item>
-<item name="postSplashScreenTheme">@style/Theme.NimonsApp</item>
+		<item name="postSplashScreenTheme">@style/Theme.NimonsApp</item>
 	</style>
 </resources>

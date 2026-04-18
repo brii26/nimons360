@@ -17,6 +17,7 @@ class FamiliesViewModel(
     private val pinnedFamilyRepository = PinnedFamilyRepository(application)
 
     override fun FamiliesUiState.withMeta(meta: UiResourceMeta): FamiliesUiState = copy(meta = meta)
+
     override fun FamiliesUiState.withRefreshing(isRefreshing: Boolean): FamiliesUiState = copy(isRefreshing = isRefreshing)
 
     fun loadFamilies() {
@@ -81,17 +82,20 @@ class FamiliesViewModel(
     }
 
     private fun FamiliesUiState.recomputeFilter(resetPage: Boolean): FamiliesUiState {
-        val myIds: Set<Int>? = if (selectedFilter == FamiliesFilter.MY_FAMILIES) {
-            myFamilies.map { it.id }.toSet()
-        } else null
+        val myIds: Set<Int>? =
+            if (selectedFilter == FamiliesFilter.MY_FAMILIES) {
+                myFamilies.map { it.id }.toSet()
+            } else {
+                null
+            }
         val pinnedSet = pinnedFamilyIds.toSet()
 
-        val filtered = allFamilies
-            .filter { family ->
-                (searchQuery.isEmpty() || family.name.contains(searchQuery, ignoreCase = true)) &&
-                    (myIds == null || family.id in myIds)
-            }
-            .map { FamilyItem(it, it.id in pinnedSet) }
+        val filtered =
+            allFamilies
+                .filter { family ->
+                    (searchQuery.isEmpty() || family.name.contains(searchQuery, ignoreCase = true)) &&
+                        (myIds == null || family.id in myIds)
+                }.map { FamilyItem(it, it.id in pinnedSet) }
 
         return copy(
             allFilteredItems = filtered,

@@ -16,7 +16,6 @@ import com.tit.nimonsapp.R
 abstract class AppFloatingModalFragment(
     @LayoutRes private val contentLayoutId: Int,
 ) : DialogFragment() {
-
     override fun getTheme(): Int = R.style.AppFloatingModal
 
     override fun onCreateView(

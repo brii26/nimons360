@@ -79,7 +79,9 @@ interface FamilyApi {
     ): ApiResponse<LeaveFamilyResponseDto>
 }
 
-class AuthInterceptor(private val context: Context) : Interceptor {
+class AuthInterceptor(
+    private val context: Context,
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         val response = chain.proceed(request)
@@ -90,11 +92,12 @@ class AuthInterceptor(private val context: Context) : Interceptor {
             runBlocking {
                 sessionRepository.clearToken()
             }
-            
+
             // Redirect to MainActivity which should handle the login routing if no token
-            val intent = Intent(context, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
+            val intent =
+                Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
             context.startActivity(intent)
         }
         return response
@@ -121,18 +124,21 @@ object Api {
         }
 
     private val okHttpClient by lazy {
-        val builder = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-        
+        val builder =
+            OkHttpClient
+                .Builder()
+                .addInterceptor(loggingInterceptor)
+
         appContext?.let {
             builder.addInterceptor(AuthInterceptor(it))
         }
-        
+
         builder.build()
     }
 
     private val retrofit by lazy {
-        Retrofit.Builder()
+        Retrofit
+            .Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(

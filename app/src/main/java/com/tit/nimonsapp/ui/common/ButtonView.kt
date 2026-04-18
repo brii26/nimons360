@@ -4,8 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import com.google.android.material.button.MaterialButton
 
-class ButtonView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = com.google.android.material.R.attr.materialButtonStyle,
-) : MaterialButton(context, attrs, defStyleAttr)
+class ButtonView
+    @JvmOverloads
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = com.google.android.material.R.attr.materialButtonStyle,
+    ) : MaterialButton(context, attrs, defStyleAttr)

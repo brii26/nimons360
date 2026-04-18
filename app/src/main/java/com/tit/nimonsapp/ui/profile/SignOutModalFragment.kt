@@ -10,17 +10,20 @@ import com.tit.nimonsapp.ui.common.AppFloatingModalFragment
 class SignOutModalFragment(
     private val onConfirm: () -> Unit,
 ) : AppFloatingModalFragment(R.layout.content_sign_out) {
+    private var binding: ContentSignOutBinding? = null
 
-    private var _binding: ContentSignOutBinding? = null
-    private val binding get() = _binding!!
+    private fun requireBinding(): ContentSignOutBinding = requireNotNull(binding)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         val contentContainer = view.findViewById<FrameLayout>(R.id.modal_content)
-        _binding = ContentSignOutBinding.bind(contentContainer.getChildAt(0))
+        binding = ContentSignOutBinding.bind(contentContainer.getChildAt(0))
 
-        binding.btnCancel.setOnClickListener { dismiss() }
-        binding.btnSignOut.setOnClickListener {
+        requireBinding().btnCancel.setOnClickListener { dismiss() }
+        requireBinding().btnSignOut.setOnClickListener {
             dismiss()
             onConfirm()
         }
@@ -28,6 +31,6 @@ class SignOutModalFragment(
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 }

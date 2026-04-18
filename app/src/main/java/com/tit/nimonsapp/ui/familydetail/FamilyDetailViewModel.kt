@@ -14,10 +14,10 @@ class FamilyDetailViewModel(
     private val authRepository = AuthRepository()
     private var currentFamilyId: Int? = null
 
-    override fun FamilyDetailUiState.withMeta(meta: UiResourceMeta): FamilyDetailUiState = 
+    override fun FamilyDetailUiState.withMeta(meta: UiResourceMeta): FamilyDetailUiState =
         copy(
             meta = meta,
-            isSubmittingAction = if (meta.errorMessage != null) false else isSubmittingAction
+            isSubmittingAction = if (meta.errorMessage != null) false else isSubmittingAction,
         )
 
     override fun FamilyDetailUiState.withRefreshing(isRefreshing: Boolean): FamilyDetailUiState = copy(isRefreshing = isRefreshing)
@@ -42,7 +42,7 @@ class FamilyDetailViewModel(
             loader = { token ->
                 Pair(
                     familyRepository.getFamilyDetail(token, familyId),
-                    authRepository.getMe(token)
+                    authRepository.getMe(token),
                 )
             },
             onSuccess = { (familyDetail, me) ->
@@ -51,7 +51,10 @@ class FamilyDetailViewModel(
         )
     }
 
-    fun joinFamily(familyCode: String, onJoinSuccess: () -> Unit) {
+    fun joinFamily(
+        familyCode: String,
+        onJoinSuccess: () -> Unit,
+    ) {
         val familyId = currentFamilyId ?: uiState.value.familyDetail?.id ?: return
 
         if (familyCode.isBlank()) {

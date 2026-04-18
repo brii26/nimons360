@@ -50,17 +50,19 @@ fun homeScreen(
         state.meta.errorMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
     }
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = state.isRefreshing,
-        onRefresh = onRefresh,
-    )
+    val pullRefreshState =
+        rememberPullRefreshState(
+            refreshing = state.isRefreshing,
+            onRefresh = onRefresh,
+        )
 
     Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             item {

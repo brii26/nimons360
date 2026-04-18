@@ -8,7 +8,8 @@ import com.tit.nimonsapp.ui.common.UiResourceMeta
 const val FAMILIES_PAGE_SIZE = 5
 
 enum class FamiliesFilter {
-    ALL, MY_FAMILIES
+    ALL,
+    MY_FAMILIES,
 }
 
 data class FamilyItem(
@@ -28,7 +29,6 @@ data class FamiliesUiState(
     val allFilteredItems: List<FamilyItem> = emptyList(),
     val displayedCount: Int = FAMILIES_PAGE_SIZE,
 ) : RefreshableStatefulUi {
-
     val pagedItems: List<FamilyItem>
         get() = allFilteredItems.take(displayedCount)
 

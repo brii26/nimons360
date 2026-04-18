@@ -56,10 +56,11 @@ private fun discoverFamilyRow(
     onJoinClick: (Int) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onFamilyClick(family.id) }
-            .padding(horizontal = 16.dp, vertical = 18.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onFamilyClick(family.id) }
+                .padding(horizontal = 16.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         iconImage(iconUrl = family.iconUrl, size = 52.dp)

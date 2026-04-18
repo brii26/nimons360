@@ -6,8 +6,8 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -86,9 +86,10 @@ fun splashScreen(onSplashFinished: () -> Unit) {
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(R.color.splash_background)),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(colorResource(R.color.splash_background)),
         contentAlignment = Alignment.Center,
     ) {
         SplashGridBackground(
@@ -99,14 +100,14 @@ fun splashScreen(onSplashFinished: () -> Unit) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-			modifier = Modifier.offset(y = (-30).dp)
+            modifier = Modifier.offset(y = (-30).dp),
         ) {
             SplashMapPin(
                 dropOffsetY = pinOffsetY,
                 showRipple = pinDropped,
             )
 
-			Modifier.offset(y = (-20).dp)
+            Modifier.offset(y = (-20).dp)
 
             SplashTitle(
                 titleOffsetX = titleOffsetX.value,
@@ -119,9 +120,10 @@ fun splashScreen(onSplashFinished: () -> Unit) {
             dot1Alpha = dot1Alpha.value,
             dot2Alpha = dot2Alpha.value,
             dot3Alpha = dot3Alpha.value,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 80.dp),
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 80.dp),
         )
     }
 }

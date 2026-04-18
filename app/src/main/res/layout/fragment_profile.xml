@@ -1,122 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" android:fillViewport="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+	<LinearLayout android:layout_width="match_parent"
+		android:layout_height="wrap_content" android:orientation="vertical"
+		android:padding="24dp">
 
-        <!-- Page title -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+		<!-- Page title -->
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="Profile"
+			android:textSize="28sp" android:textStyle="bold"
+			android:layout_marginBottom="24dp" />
 
-        <!-- Profile card -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
+		<!-- Profile card -->
+		<com.google.android.material.card.MaterialCardView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			app:cardBackgroundColor="@color/white" app:cardCornerRadius="16dp"
+			app:cardElevation="2dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:padding="24dp"
-                android:clipChildren="false"
-                android:clipToPadding="false">
+			<LinearLayout android:layout_width="match_parent"
+				android:layout_height="wrap_content" android:orientation="vertical"
+				android:gravity="center_horizontal" android:padding="24dp"
+				android:clipChildren="false" android:clipToPadding="false">
 
-                <!-- Avatar + edit badge overlay -->
-                <FrameLayout
-                    android:layout_width="88dp"
-                    android:layout_height="88dp"
-                    android:clipChildren="false">
+				<!-- Avatar + edit badge overlay -->
+				<FrameLayout android:layout_width="88dp"
+					android:layout_height="88dp" android:clipChildren="false">
 
-                    <com.tit.nimonsapp.ui.common.AvatarView
-                        android:id="@+id/profile_avatar"
-                        android:layout_width="88dp"
-                        android:layout_height="88dp"
-                        app:avatarShape="circle"
-                        app:avatarText="?" />
+					<com.tit.nimonsapp.ui.common.AvatarView
+						android:id="@+id/profile_avatar" android:layout_width="88dp"
+						android:layout_height="88dp" app:avatarShape="circle"
+						app:avatarText="?" />
 
-                    <!-- Badge: half inside, half outside bottom-right corner -->
-                    <ImageButton
-                        android:id="@+id/edit_avatar_button"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginEnd="-3dp"
-                        android:layout_marginBottom="0dp"
-                        android:background="@drawable/bg_avatar_edit_badge"
-                        android:src="@drawable/ic_edit"
-                        android:scaleType="centerInside"
-                        android:padding="5dp"
-                        android:contentDescription="Edit profile" />
+					<!-- Badge: half inside, half outside bottom-right corner -->
+					<ImageButton android:id="@+id/edit_avatar_button"
+						android:layout_width="28dp" android:layout_height="28dp"
+						android:layout_gravity="bottom|end"
+						android:layout_marginEnd="-3dp" android:layout_marginBottom="0dp"
+						android:background="@drawable/bg_avatar_edit_badge"
+						android:src="@drawable/ic_edit" android:scaleType="centerInside"
+						android:padding="5dp" android:contentDescription="Edit profile" />
 
-                </FrameLayout>
+				</FrameLayout>
 
-                <!-- Full name -->
-                <TextView
-                    android:id="@+id/profile_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    tools:text="Matthew Ivan Widjaja" />
+				<!-- Full name -->
+				<TextView android:id="@+id/profile_name"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="16dp" android:textSize="20sp"
+					android:textStyle="bold" android:textColor="?attr/colorOnSurface"
+					tools:text="Matthew Ivan Widjaja" />
 
-                <!-- Email -->
-                <TextView
-                    android:id="@+id/profile_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="13523142@std.stei.itb.ac.id" />
+				<!-- Email -->
+				<TextView android:id="@+id/profile_email"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content" android:layout_marginTop="4dp"
+					android:textSize="14sp"
+					android:textColor="?attr/colorOnSurfaceVariant"
+					tools:text="13523142@std.stei.itb.ac.id" />
 
-            </LinearLayout>
+			</LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+		</com.google.android.material.card.MaterialCardView>
 
-        <!-- Back to Home button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/back_home_button"
-            style="@style/Button.Outlined"
-            android:layout_marginTop="24dp"
-            android:text="Back to Home" />
+		<!-- Back to Home button -->
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/back_home_button" style="@style/Button.Outlined"
+			android:layout_marginTop="24dp" android:text="Back to Home" />
 
-        <!-- Sign Out button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logout_button"
-            style="@style/Button.Destructive"
-            android:layout_marginTop="5dp"
-            android:text="Sign Out" />
+		<!-- Sign Out button -->
+		<com.google.android.material.button.MaterialButton
+			android:id="@+id/logout_button" style="@style/Button.Destructive"
+			android:layout_marginTop="5dp" android:text="Sign Out" />
 
-        <!-- Copyright -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:textSize="12sp"
-            android:textColor="@color/section_label"
-            android:text="© Nimons360" />
+		<!-- Copyright -->
+		<TextView android:layout_width="match_parent"
+			android:layout_height="wrap_content" android:layout_marginTop="16dp"
+			android:gravity="center" android:textSize="12sp"
+			android:textColor="@color/section_label" android:text="© Nimons360" />
 
-    </LinearLayout>
+	</LinearLayout>
 
 </ScrollView>

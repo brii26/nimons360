@@ -1,7 +1,7 @@
 package com.tit.nimonsapp.data.repository
 
-import android.annotation.SuppressLint
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -35,10 +35,12 @@ data class DeviceLocation(
     val rotation: Double = 0.0,
     val batteryLevel: Int = 100,
     val isCharging: Boolean = false,
-    val internetStatus: String = "unknown"
+    val internetStatus: String = "unknown",
 )
 
-class LocationRepository(private val context: Context) {
+class LocationRepository(
+    private val context: Context,
+) {
     private val _currentLocation = MutableStateFlow(DeviceLocation())
     val currentLocation: StateFlow<DeviceLocation> = _currentLocation.asStateFlow()
 
@@ -51,35 +53,41 @@ class LocationRepository(private val context: Context) {
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
 
-    private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            result.locations.lastOrNull()?.let { location ->
-                _currentLocation.update {
-                    it.copy(
-                        latitude = location.latitude,
-                        longitude = location.longitude,
-                        internetStatus = getInternetStatus()
-                    )
+    private val locationCallback =
+        object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                result.locations.lastOrNull()?.let { location ->
+                    _currentLocation.update {
+                        it.copy(
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            internetStatus = getInternetStatus(),
+                        )
+                    }
+                    // printing logcat
+                    val current = _currentLocation.value
+                    Log.d("NIMONS_GPS", "Lat: ${current.latitude}, Lon: ${current.longitude}, Rot: ${current.rotation}")
                 }
-                // printing logcat
-                val current = _currentLocation.value
-                Log.d("NIMONS_GPS", "Lat: ${current.latitude}, Lon: ${current.longitude}, Rot: ${current.rotation}")
             }
         }
-    }
 
-    private val sensorListener = object : SensorEventListener {
-        override fun onSensorChanged(event: SensorEvent) {
-            synchronized(this) {
-                when (event.sensor.type) {
-                    Sensor.TYPE_ACCELEROMETER -> System.arraycopy(event.values, 0, accelerometerReading, 0, 3)
-                    Sensor.TYPE_MAGNETIC_FIELD -> System.arraycopy(event.values, 0, magnetometerReading, 0, 3)
+    private val sensorListener =
+        object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                synchronized(this) {
+                    when (event.sensor.type) {
+                        Sensor.TYPE_ACCELEROMETER -> System.arraycopy(event.values, 0, accelerometerReading, 0, 3)
+                        Sensor.TYPE_MAGNETIC_FIELD -> System.arraycopy(event.values, 0, magnetometerReading, 0, 3)
+                    }
+                    updateOrientation()
                 }
-                updateOrientation()
             }
+
+            override fun onAccuracyChanged(
+                sensor: Sensor?,
+                accuracy: Int,
+            ) {}
         }
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-    }
 
     private var batteryReceiver: BroadcastReceiver? = null
 
@@ -89,21 +97,26 @@ class LocationRepository(private val context: Context) {
 
         // Start battery monitoring langsung pas init
         val batteryIntentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        batteryReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-                val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-                val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-                val isCharging = plugged != 0 && (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL)
+        batteryReceiver =
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context,
+                    intent: Intent,
+                ) {
+                    val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                    val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+                    val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+                    val isCharging =
+                        plugged != 0 && (status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL)
 
-                _currentLocation.update {
-                    it.copy(
-                        batteryLevel = level,
-                        isCharging = isCharging
-                    )
+                    _currentLocation.update {
+                        it.copy(
+                            batteryLevel = level,
+                            isCharging = isCharging,
+                        )
+                    }
                 }
             }
-        }
         context.registerReceiver(batteryReceiver, batteryIntentFilter)
     }
 
@@ -112,9 +125,11 @@ class LocationRepository(private val context: Context) {
         if (!hasLocationPermission()) return
 
         // 1s Interval
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-            .setMinUpdateIntervalMillis(1000)
-            .build()
+        val locationRequest =
+            LocationRequest
+                .Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+                .setMinUpdateIntervalMillis(1000)
+                .build()
 
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
@@ -156,10 +171,14 @@ class LocationRepository(private val context: Context) {
                 context.unregisterReceiver(it)
                 batteryReceiver = null
             }
-        } catch (e: Exception) { e.printStackTrace() }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
-    fun hasLocationPermission(): Boolean = ContextCompat.checkSelfPermission(
-        context, Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    fun hasLocationPermission(): Boolean =
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+        ) == PackageManager.PERMISSION_GRANTED
 }

@@ -11,8 +11,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.ui.map.UserOnMap
 
-class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
-
+class UserInfoBottomSheet(
+    context: Context,
+) : BottomSheetDialog(context) {
     private val avatarView: AvatarView
     private val tvUserName: TextView
     private val tvUserEmail: TextView
@@ -43,7 +44,7 @@ class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
         // Set avatar with first letter of name
         avatarView.setLetter(
             user.fullName.take(1).uppercase(),
-            ContextCompat.getColor(context, R.color.nimons_green)
+            ContextCompat.getColor(context, R.color.nimons_green),
         )
 
         // Set name and email
@@ -60,19 +61,24 @@ class UserInfoBottomSheet(context: Context) : BottomSheetDialog(context) {
         tvLocationValue.text = String.format("%.3f, %.3f", user.latitude, user.longitude)
 
         // Set network status
-        tvWifiValue.text = when (user.internetStatus) {
-            "wifi" -> "WiFi"
-            "mobile" -> "Mobile"
-            else -> "Unknown"
-        }
+        tvWifiValue.text =
+            when (user.internetStatus) {
+                "wifi" -> "WiFi"
+                "mobile" -> "Mobile"
+                else -> "Unknown"
+            }
 
         // Set WiFi icon color based on status
         ivWifiIcon.setColorFilter(
             when (user.internetStatus) {
-                "wifi" -> Color.parseColor("#4CAF50") // Green
-                "mobile" -> Color.parseColor("#FF9800") // Orange
+                "wifi" -> Color.parseColor("#4CAF50")
+
+                // Green
+                "mobile" -> Color.parseColor("#FF9800")
+
+                // Orange
                 else -> Color.parseColor("#9E9E9E") // Gray
-            }
+            },
         )
     }
 

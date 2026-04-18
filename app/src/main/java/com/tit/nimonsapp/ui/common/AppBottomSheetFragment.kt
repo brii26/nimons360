@@ -18,7 +18,6 @@ import com.tit.nimonsapp.R
 abstract class AppBottomSheetFragment(
     @LayoutRes private val contentLayoutId: Int,
 ) : BottomSheetDialogFragment() {
-
     override fun getTheme(): Int = R.style.AppBottomSheet
 
     override fun onCreateView(

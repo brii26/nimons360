@@ -18,8 +18,9 @@ import com.tit.nimonsapp.databinding.FragmentCreateFamiliesBinding
 import kotlinx.coroutines.launch
 
 class CreateFamilyFragment : Fragment() {
-    private var _binding: FragmentCreateFamiliesBinding? = null
-    private val binding get() = _binding!!
+    private var binding: FragmentCreateFamiliesBinding? = null
+
+    private fun requireBinding(): FragmentCreateFamiliesBinding = requireNotNull(binding)
 
     private val viewModel: CreateFamilyViewModel by viewModels()
     private lateinit var iconPickerAdapter: IconPickerAdapter
@@ -29,11 +30,14 @@ class CreateFamilyFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentCreateFamiliesBinding.inflate(inflater, container, false)
-        return binding.root
+        binding = FragmentCreateFamiliesBinding.inflate(inflater, container, false)
+        return requireBinding().root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         setupIconPicker()
@@ -42,26 +46,27 @@ class CreateFamilyFragment : Fragment() {
     }
 
     private fun setupIconPicker() {
-        iconPickerAdapter = IconPickerAdapter(familyIcons) { selectedUrl ->
-            viewModel.onIconUrlChanged(selectedUrl)
-        }
+        iconPickerAdapter =
+            IconPickerAdapter(familyIcons) { selectedUrl ->
+                viewModel.onIconUrlChanged(selectedUrl)
+            }
 
-        binding.rvIconPicker.apply {
+        requireBinding().rvIconPicker.apply {
             layoutManager = GridLayoutManager(context, 5)
             adapter = iconPickerAdapter
         }
     }
 
     private fun setupListeners() {
-        binding.btnCancel.setOnClickListener {
+        requireBinding().btnCancel.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        binding.btnCreate.setOnClickListener {
+        requireBinding().btnCreate.setOnClickListener {
             viewModel.createFamily()
         }
 
-        binding.etFamilyName.addTextChangedListener { text ->
+        requireBinding().etFamilyName.addTextChangedListener { text ->
             viewModel.onNameChanged(text?.toString() ?: "")
         }
     }
@@ -70,27 +75,25 @@ class CreateFamilyFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    // Update Preview Icon
-                    binding.ivPreviewIcon.load(state.iconUrl) {
+                    requireBinding().ivPreviewIcon.load(state.iconUrl) {
                         crossfade(true)
                         placeholder(R.drawable.ic_app)
                     }
 
-                    // Update Button State
-                    binding.btnCreate.isEnabled = state.name.isNotBlank() && !state.meta.isLoading
-                    
-                    // Visual feedback for disabled state
-                    binding.btnCreate.setTextColor(
-                        if (binding.btnCreate.isEnabled) 
+                    requireBinding().btnCreate.isEnabled =
+                        state.name.isNotBlank() && !state.meta.isLoading
+
+                    requireBinding().btnCreate.setTextColor(
+                        if (requireBinding().btnCreate.isEnabled) {
                             resources.getColor(R.color.nimons_green, null)
-                        else 
+                        } else {
                             resources.getColor(R.color.section_label, null)
+                        },
                     )
 
-                    // Loading State
-                    binding.loadingIndicator.visibility = if (state.meta.isLoading) View.VISIBLE else View.GONE
+                    requireBinding().loadingIndicator.visibility =
+                        if (state.meta.isLoading) View.VISIBLE else View.GONE
 
-                    // Handle Success
                     if (state.createdFamily != null) {
                         viewModel.consumeCreatedFamily()
                         findNavController().popBackStack()
@@ -102,6 +105,6 @@ class CreateFamilyFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 }

@@ -28,15 +28,16 @@ import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
-import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.OnMapReadyCallback
 import org.maplibre.android.maps.Style
 import org.maplibre.android.plugins.markerview.MarkerView
 import org.maplibre.android.plugins.markerview.MarkerViewManager
 
-class MapFragment : Fragment(), OnMapReadyCallback {
-
+class MapFragment :
+    Fragment(),
+    OnMapReadyCallback {
     private lateinit var mapView: MapView
     private lateinit var mapLibreMap: MapLibreMap
     private lateinit var markerViewManager: MarkerViewManager
@@ -51,18 +52,19 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var userInfoBottomSheet: UserInfoBottomSheet? = null
     private lateinit var mapSearchEditText: EditText
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val fineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
-        if (fineLocation) {
-            viewModel.setGpsPermissionGranted(true)
-            startLocationUpdates()
-        } else {
-            viewModel.setGpsPermissionGranted(false)
-            showSnackbar("Location permission required - enable to share your position")
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions(),
+        ) { permissions ->
+            val fineLocation = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            if (fineLocation) {
+                viewModel.setGpsPermissionGranted(true)
+                startLocationUpdates()
+            } else {
+                viewModel.setGpsPermissionGranted(false)
+                showSnackbar("Location permission required - enable to share your position")
+            }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,15 +74,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         MapLibre.getInstance(requireContext())
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        mapSearchEditText = view.findViewById<EditText>(R.id.et_search) 
-            ?: view.findViewById<View>(R.id.map_search_bar)?.findViewById<EditText>(R.id.et_search) 
+        mapSearchEditText = view.findViewById<EditText>(R.id.et_search)
+            ?: view.findViewById<View>(R.id.map_search_bar)?.findViewById<EditText>(R.id.et_search)
             ?: EditText(requireContext())
 
         mapView = view.findViewById(R.id.mapView) ?: MapView(requireContext()).apply {
-            val params = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            )
+            val params =
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                )
             layoutParams = params
             (view as FrameLayout).addView(this)
         }
@@ -92,7 +95,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     // Initialize location tracking and observe WebSocket messages
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         locationRepository = LocationRepository(requireContext())
@@ -117,9 +123,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         markerViewManager = MarkerViewManager(mapView, map)
 
         map.setStyle(
-            Style.Builder().fromUri("https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json")
+            Style.Builder().fromUri("https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json"),
         )
-        
+
         map.uiSettings.isLogoEnabled = false
         map.uiSettings.isAttributionEnabled = true
     }
@@ -180,19 +186,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val initial = profile?.fullName?.take(1)?.uppercase() ?: "M"
 
         if (currentUserMarker == null) {
-            currentUserMarkerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.CURRENT_USER).apply {
-                setMarkerData(initial)
-                setMarkerRotation(location.rotation.toFloat())
-            }
+            currentUserMarkerView =
+                MapMarkerView(requireContext(), MapMarkerView.MarkerType.CURRENT_USER).apply {
+                    setMarkerData(initial)
+                    setMarkerRotation(location.rotation.toFloat())
+                }
 
-            currentUserMarker = MarkerView(position, currentUserMarkerView!!).apply {
-                markerViewManager.addMarker(this)
-            }
+            currentUserMarker =
+                MarkerView(position, currentUserMarkerView!!).apply {
+                    markerViewManager.addMarker(this)
+                }
 
             currentUserMarkerView?.setOnClickListener {
                 showMyInfoBottomSheet()
             }
-            
+
             mapLibreMap.animateCamera(CameraUpdateFactory.newLatLngZoom(position, 15.0))
         } else {
             currentUserMarker?.setLatLng(position)
@@ -224,13 +232,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupSearchBar() {
-        mapSearchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                viewModel.updateSearchQuery(s?.toString() ?: "")
-            }
-        })
+        mapSearchEditText.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {}
+
+                override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int,
+                ) {}
+
+                override fun afterTextChanged(s: Editable?) {
+                    viewModel.updateSearchQuery(s?.toString() ?: "")
+                }
+            },
+        )
     }
 
     private fun updateOtherUsersMarkers(users: Map<Int, UserOnMap>) {
@@ -238,7 +260,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val currentIds = markers.keys.toList()
         val newIds = users.keys
-        val myId = viewModel.uiState.value.currentUserProfile?.id
+        val myId =
+            viewModel.uiState.value.currentUserProfile
+                ?.id
 
         currentIds.forEach { userId ->
             if (userId !in newIds) {
@@ -255,16 +279,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (userId in markers) {
                 markers[userId]?.setLatLng(position)
             } else {
-                val markerView = MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER).apply {
-                    setMarkerData(
-                        user.fullName.take(1).uppercase(),
-                        ContextCompat.getColor(requireContext(), R.color.nimons_green),
-                    )
-                }
+                val markerView =
+                    MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER).apply {
+                        setMarkerData(
+                            user.fullName.take(1).uppercase(),
+                            ContextCompat.getColor(requireContext(), R.color.nimons_green),
+                        )
+                    }
 
-                val marker = MarkerView(position, markerView).apply {
-                    markerViewManager.addMarker(this)
-                }
+                val marker =
+                    MarkerView(position, markerView).apply {
+                        markerViewManager.addMarker(this)
+                    }
 
                 markers[userId] = marker
 
@@ -278,13 +304,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun showUserInfoBottomSheet(user: UserOnMap) {
         dismissUserInfoBottomSheet()
 
-        userInfoBottomSheet = UserInfoBottomSheet(requireContext()).apply {
-            setUser(user)
-            setOnDismissListener {
-                userInfoBottomSheet = null
+        userInfoBottomSheet =
+            UserInfoBottomSheet(requireContext()).apply {
+                setUser(user)
+                setOnDismissListener {
+                    userInfoBottomSheet = null
+                }
+                show()
             }
-            show()
-        }
     }
 
     // Show current user's info in bottom sheet (clicked on own marker)
@@ -294,25 +321,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val currentUser = viewModel.uiState.value.currentLocation
         // Get current location and profile (loaded from /api/me)
         val profile = viewModel.uiState.value.currentUserProfile
-        val myUserOnMap = UserOnMap(
-            userId = profile?.id ?: 0,
-            fullName = profile?.fullName ?: "Me",
-            email = profile?.email ?: "me@std.stei.itb.ac.id",
-            latitude = currentUser.latitude,
-            longitude = currentUser.longitude,
-            rotation = currentUser.rotation,
-            batteryLevel = currentUser.batteryLevel,
-            isCharging = currentUser.isCharging,
-            internetStatus = currentUser.internetStatus,
-            lastUpdateTimestamp = System.currentTimeMillis(),
-        )
-        userInfoBottomSheet = UserInfoBottomSheet(requireContext()).apply {
-            setUser(myUserOnMap)
-            setOnDismissListener {
-                userInfoBottomSheet = null
+        val myUserOnMap =
+            UserOnMap(
+                userId = profile?.id ?: 0,
+                fullName = profile?.fullName ?: "Me",
+                email = profile?.email ?: "me@std.stei.itb.ac.id",
+                latitude = currentUser.latitude,
+                longitude = currentUser.longitude,
+                rotation = currentUser.rotation,
+                batteryLevel = currentUser.batteryLevel,
+                isCharging = currentUser.isCharging,
+                internetStatus = currentUser.internetStatus,
+                lastUpdateTimestamp = System.currentTimeMillis(),
+            )
+        userInfoBottomSheet =
+            UserInfoBottomSheet(requireContext()).apply {
+                setUser(myUserOnMap)
+                setOnDismissListener {
+                    userInfoBottomSheet = null
+                }
+                show()
             }
-            show()
-        }
     }
 
     private fun dismissUserInfoBottomSheet() {

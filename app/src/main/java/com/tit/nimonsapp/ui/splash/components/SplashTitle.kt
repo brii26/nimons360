@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.tit.nimonsapp.R
 
 @Composable
-fun SplashTitle(
+fun splashTitle(
     titleOffsetX: Float,
     titleAlpha: Float,
     underlineWidth: Float,
@@ -39,9 +39,10 @@ fun SplashTitle(
         modifier = modifier,
     ) {
         Row(
-            modifier = Modifier
-                .offset { IntOffset(titleOffsetX.toInt(), 0) }
-                .alpha(titleAlpha),
+            modifier =
+                Modifier
+                    .offset { IntOffset(titleOffsetX.toInt(), 0) }
+                    .alpha(titleAlpha),
         ) {
             Text(
                 text = stringResource(R.string.splash_app_name_prefix),
@@ -62,11 +63,12 @@ fun SplashTitle(
         Spacer(modifier = Modifier.height(8.dp))
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth(0.5f * underlineWidth)
-                .height(4.dp)
-                .clip(RoundedCornerShape(50))
-                .background(underlineColor),
+            modifier =
+                Modifier
+                    .fillMaxWidth(0.5f * underlineWidth)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(underlineColor),
         )
     }
 }
