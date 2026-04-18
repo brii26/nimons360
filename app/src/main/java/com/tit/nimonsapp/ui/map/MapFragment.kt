@@ -313,14 +313,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
             show()
         }
-
-        userInfoBottomSheet = UserInfoBottomSheet(requireContext()).apply {
-            setUser(myUserOnMap)
-            setOnDismissListener {
-                userInfoBottomSheet = null
-            }
-            show()
-        }
     }
 
     private fun dismissUserInfoBottomSheet() {
