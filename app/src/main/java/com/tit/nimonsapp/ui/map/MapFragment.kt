@@ -56,6 +56,7 @@ class MapFragment :
 
     private var locationCollectionJob: Job? = null
     private var offlineCleanupJob: Job? = null
+    private var isMapStyleReady = false
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -137,14 +138,23 @@ class MapFragment :
 
     override fun onMapReady(map: MapLibreMap) {
         mapLibreMap = map
-        markerViewManager = MarkerViewManager(mapView, map)
 
         map.setStyle(
             Style.Builder().fromUri("https://tiles.basemaps.cartocdn.com/gl/voyager-gl-style/style.json"),
-        )
+        ) {
+            markerViewManager = MarkerViewManager(mapView, map)
+            isMapStyleReady = true
 
-        map.uiSettings.isLogoEnabled = false
-        map.uiSettings.isAttributionEnabled = true
+            map.uiSettings.isLogoEnabled = false
+            map.uiSettings.isAttributionEnabled = true
+
+            // optional: refresh markers once map is really ready
+            updateOtherUsersMarkers(viewModel.getFilteredUsers())
+            val currentLocation = viewModel.uiState.value.currentLocation
+            if (currentLocation.latitude != 0.0 && currentLocation.longitude != 0.0) {
+                updateCurrentUserMarker(currentLocation)
+            }
+        }
     }
 
     private fun requestLocationPermission() {
@@ -173,7 +183,7 @@ class MapFragment :
 
         if (locationCollectionJob == null) {
             locationCollectionJob =
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     locationRepository.currentLocation.collect { location ->
                         if (location.latitude != 0.0 && location.longitude != 0.0) {
                             Log.d("NIMONS_MAP", "location -> ${location.latitude}, ${location.longitude}, ${location.internetStatus}")
@@ -193,7 +203,7 @@ class MapFragment :
 
         if (offlineCleanupJob == null) {
             offlineCleanupJob =
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     while (true) {
                         delay(5000)
                         viewModel.removeOfflineUsers()
@@ -204,6 +214,8 @@ class MapFragment :
 
     private fun updateCurrentUserMarker(location: DeviceLocation) {
         if (!::mapLibreMap.isInitialized) return
+        if (!::markerViewManager.isInitialized) return
+        if (!isMapStyleReady) return
 
         val position = LatLng(location.latitude, location.longitude)
         val profile = viewModel.uiState.value.currentUserProfile
@@ -234,16 +246,18 @@ class MapFragment :
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->
-                updateOtherUsersMarkers(viewModel.getFilteredUsers())
+                if (isMapStyleReady) {
+                    updateOtherUsersMarkers(viewModel.getFilteredUsers())
+                }
                 state.meta.errorMessage?.let { message ->
                     showSnackbar(message)
                 }
             }
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 state.selectedUserId?.let { userId ->
                     state.otherUsers[userId]?.let { user ->
@@ -280,7 +294,10 @@ class MapFragment :
     }
 
     private fun updateOtherUsersMarkers(users: Map<Int, UserOnMap>) {
+        if (!::mapLibreMap.isInitialized) return
         if (!::markerViewManager.isInitialized) return
+        if (!isMapStyleReady) return
+        if (!isAdded || view == null) return
 
         val currentIds = markers.keys.toList()
         val newIds = users.keys
@@ -411,9 +428,19 @@ class MapFragment :
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // We don't disconnect WebSocket here anymore, it's global
         locationRepository.stopLocationUpdates()
         dismissUserInfoBottomSheet()
+
+        locationCollectionJob?.cancel()
+        locationCollectionJob = null
+        offlineCleanupJob?.cancel()
+        offlineCleanupJob = null
+
+        markers.clear()
+        currentUserMarker = null
+        currentUserMarkerView = null
+        isMapStyleReady = false
+
         mapView.onDestroy()
     }
 }
