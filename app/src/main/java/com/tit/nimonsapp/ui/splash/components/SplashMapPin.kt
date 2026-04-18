@@ -6,7 +6,6 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.isTransitioningTo
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
@@ -43,7 +42,7 @@ fun splashMapPin(
 
     val squashScaleY by transition.animateFloat(
         transitionSpec = {
-            if (false isTransitioningTo true) {
+            if (targetState) {
                 keyframes {
                     durationMillis = 800
                     1.1f at 0 with LinearOutSlowInEasing
@@ -61,7 +60,7 @@ fun splashMapPin(
 
     val squashScaleX by transition.animateFloat(
         transitionSpec = {
-            if (false isTransitioningTo true) {
+            if (targetState) {
                 keyframes {
                     durationMillis = 800
                     0.9f at 0
