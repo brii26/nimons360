@@ -86,7 +86,9 @@ class AuthInterceptor(
         val request = chain.request()
         val response = chain.proceed(request)
 
-        if (response.code == 409 || response.code == 401) {
+        val isLoginEndpoint = request.url.encodedPath.contains("/api/login")
+
+        if (response.code == 401 && !isLoginEndpoint) {
             val sessionRepository = SessionRepository(context)
             runBlocking {
                 sessionRepository.clearToken()
@@ -126,6 +128,10 @@ object Api {
             OkHttpClient
                 .Builder()
                 .addInterceptor(loggingInterceptor)
+                .retryOnConnectionFailure(true)
+                .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
 
         appContext?.let {
             builder.addInterceptor(AuthInterceptor(it))
