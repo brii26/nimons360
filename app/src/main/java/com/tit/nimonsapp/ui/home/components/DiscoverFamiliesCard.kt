@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import com.tit.nimonsapp.data.network.GetDiscoverFamiliesResponseDto
 import com.tit.nimonsapp.ui.common.iconImage
 
@@ -29,11 +31,12 @@ fun discoverFamiliesCard(
     onFamilyClick: (Int) -> Unit,
     onJoinClick: (Int) -> Unit,
 ) {
+    val shape = RoundedCornerShape(22.dp)
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier.fillMaxWidth().shadow(elevation = 2.dp, shape = shape),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column {
             families.forEachIndexed { index, family ->
@@ -69,7 +72,7 @@ private fun discoverFamilyRow(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = family.name,
+                text = if (family.name.length > 30) family.name.take(30) + "…" else family.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -90,11 +93,11 @@ private fun discoverFamilyRow(
         Surface(
             onClick = { onJoinClick(family.id) },
             shape = RoundedCornerShape(999.dp),
-            color = MaterialTheme.colorScheme.primaryContainer,
+            color = MaterialTheme.colorScheme.primary,
         ) {
             Text(
                 text = "Join",
-                color = MaterialTheme.colorScheme.primary,
+                color = androidx.compose.ui.graphics.Color.White,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
             )

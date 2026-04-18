@@ -2,10 +2,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 	<style name="Base.Theme.NimonsApp"
 		parent="Theme.Material3.DayNight.NoActionBar">
-		<item name="android:windowBackground">?attr/colorSurface</item>
+		<item name="android:windowBackground">@color/nimons_bg</item>
+		<item name="android:colorBackground">@color/nimons_bg</item>
 		<item name="android:fontFamily">sans-serif</item>
 		<item name="colorPrimary">@color/nimons_green</item>
 		<item name="colorOnPrimary">@color/white</item>
+		<item name="colorPrimaryContainer">@color/nimons_green_container</item>
+		<item name="colorOnPrimaryContainer">@color/nimons_on_green_container</item>
+		<item name="colorSecondary">@color/nimons_green</item>
+		<item name="colorOnSecondary">@color/white</item>
+		<item name="colorSecondaryContainer">@color/nimons_green_container</item>
+		<item name="colorOnSecondaryContainer">@color/nimons_on_green_container</item>
+		<item name="colorTertiary">@color/nimons_green</item>
+		<item name="colorOnTertiary">@color/white</item>
+		<item name="colorTertiaryContainer">@color/nimons_green_container</item>
+		<item name="colorOnTertiaryContainer">@color/nimons_on_green_container</item>
 		<item name="colorError">@color/error</item>
 	</style>
 	<style name="Theme.NimonsApp" parent="Base.Theme.NimonsApp" />

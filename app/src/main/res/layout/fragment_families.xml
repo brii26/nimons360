@@ -4,7 +4,7 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
-	android:layout_height="match_parent" android:background="@color/white"
+	android:layout_height="match_parent" android:background="@color/nimons_bg"
 	tools:context="com.tit.nimonsapp.ui.families.FamiliesFragment">
 
 	<com.google.android.material.appbar.AppBarLayout
@@ -55,17 +55,21 @@
 					style="@style/Widget.Material3.Chip.Filter"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" android:checked="true"
-					android:text="All" app:chipBackgroundColor="@color/nimons_green"
-					app:chipStrokeWidth="0dp" android:textColor="@color/white" />
+					android:text="All"
+					app:chipBackgroundColor="@color/chip_bg_selector"
+					app:chipStrokeColor="@color/chip_unselected_stroke"
+					app:chipStrokeWidth="1dp"
+					android:textColor="@color/chip_text_selector" />
 
 				<com.google.android.material.chip.Chip
 					android:id="@+id/chip_my_families"
 					style="@style/Widget.Material3.Chip.Filter"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content" android:text="My Families"
-					app:chipBackgroundColor="@color/white"
+					app:chipBackgroundColor="@color/chip_bg_selector"
 					app:chipStrokeColor="@color/chip_unselected_stroke"
-					app:chipStrokeWidth="1dp" android:textColor="@color/black" />
+					app:chipStrokeWidth="1dp"
+					android:textColor="@color/chip_text_selector" />
 
 			</com.google.android.material.chip.ChipGroup>
 
@@ -126,7 +130,7 @@
 		android:layout_gravity="bottom|end" android:layout_margin="24dp"
 		android:contentDescription="Add Family"
 		app:backgroundTint="@color/fab_bg"
-		app:srcCompat="@android:drawable/ic_input_add"
+		app:srcCompat="@drawable/ic_add"
 		app:tint="@color/nimons_green" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

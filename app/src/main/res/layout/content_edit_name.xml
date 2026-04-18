@@ -34,7 +34,8 @@
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/btn_save" style="@style/Button.Filled"
 			android:layout_width="0dp" android:layout_weight="1"
-			android:layout_marginStart="8dp" android:text="Save" />
+			android:layout_marginStart="8dp" android:text="Save"
+			app:backgroundTint="@color/nimons_green" />
 
 	</LinearLayout>
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
 import com.tit.nimonsapp.R
+import com.tit.nimonsapp.ui.theme.NimonsTheme
 
 class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
@@ -21,6 +22,7 @@ class HomeFragment : Fragment() {
     ): android.view.View =
         ComposeView(requireContext()).apply {
             setContent {
+                NimonsTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 LaunchedEffect(Unit) { viewModel.loadHome() }
@@ -47,6 +49,7 @@ class HomeFragment : Fragment() {
                         )
                     },
                 )
+                }
             }
         }
 }

@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,14 +14,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import com.tit.nimonsapp.R
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,24 +58,23 @@ fun homeScreen(
             onRefresh = onRefresh,
         )
 
-    Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
+    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        homeHeader(
+            onGoToProfile = onGoToProfile,
+            profileInitial = state.me?.fullName?.firstProfileInitial() ?: "?",
+        )
+
+        Box(modifier = Modifier.weight(1f).pullRefresh(pullRefreshState)) {
         LazyColumn(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
-            item {
-                Spacer(modifier = Modifier.height(12.dp))
-                homeHeader(
-                    onGoToProfile = onGoToProfile,
-                    profileInitial = state.me?.fullName?.firstProfileInitial() ?: "?",
-                )
-            }
+            item { Spacer(modifier = Modifier.height(4.dp)) }
 
-            item { sectionTitle("MY FAMILIES") }
+            item { sectionTitle("My Families") }
 
             item {
                 if (state.myFamilies.isEmpty() && state.meta.isLoading) {
@@ -90,7 +91,7 @@ fun homeScreen(
                 }
             }
 
-            item { sectionTitle("DISCOVER FAMILIES") }
+            item { sectionTitle("Discover Families") }
 
             item {
                 if (state.discoverFamilies.isEmpty() && state.meta.isLoading) {
@@ -120,11 +121,12 @@ fun homeScreen(
 
         FloatingActionButton(
             onClick = onGoToCreateFamily,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 20.dp, bottom = 24.dp),
+            containerColor = colorResource(R.color.fab_bg),
+            contentColor = colorResource(R.color.nimons_green),
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 24.dp, bottom = 24.dp),
         ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Create family")
+            Icon(painter = painterResource(R.drawable.ic_add), contentDescription = "Create family")
+        }
         }
     }
 }

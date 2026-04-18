@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.data.repository.SessionRepository
+import com.tit.nimonsapp.ui.theme.NimonsTheme
 import kotlinx.coroutines.launch
 
 class SplashFragment : Fragment() {
@@ -20,6 +21,7 @@ class SplashFragment : Fragment() {
     ): View =
         ComposeView(requireContext()).apply {
             setContent {
+                NimonsTheme {
                 splashScreen(
                     onSplashFinished = {
                         lifecycleScope.launch {
@@ -34,6 +36,7 @@ class SplashFragment : Fragment() {
                         }
                     },
                 )
+                }
             }
         }
 }

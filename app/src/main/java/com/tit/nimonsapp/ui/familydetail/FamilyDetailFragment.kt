@@ -70,6 +70,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import com.tit.nimonsapp.data.network.MaskedFamilyMemberDto
 import com.tit.nimonsapp.ui.common.iconImage
+import com.tit.nimonsapp.ui.theme.NimonsTheme
 
 class FamilyDetailFragment : Fragment() {
     override fun onCreateView(
@@ -81,11 +82,13 @@ class FamilyDetailFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                familyDetailScreen(
-                    familyId = familyId,
-                    onBack = { findNavController().popBackStack() },
-                    onLeaveSuccess = { findNavController().popBackStack() },
-                )
+                NimonsTheme {
+                    familyDetailScreen(
+                        familyId = familyId,
+                        onBack = { findNavController().popBackStack() },
+                        onLeaveSuccess = { findNavController().popBackStack() },
+                    )
+                }
             }
         }
     }
@@ -112,9 +115,12 @@ fun familyDetailScreen(
         topBar = {
             TopAppBar(
                 title = {
+                    val rawName = uiState.familyDetail?.name ?: "Loading..."
                     Text(
-                        uiState.familyDetail?.name ?: "Loading...",
+                        text = if (rawName.length > 30) rawName.take(30) + "…" else rawName,
                         fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     )
                 },
                 navigationIcon = {
@@ -162,10 +168,12 @@ fun familyDetailScreen(
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
                                 Text(
-                                    text = family.name,
+                                    text = if (family.name.length > 30) family.name.take(30) + "…" else family.name,
                                     color = Color.White,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                 )
                                 Text(
                                     text = "${family.members.size} members · Created ${family.createdAt.take(10)}",
@@ -718,10 +726,12 @@ fun memberItem(
                 )
             } else {
                 Text(
-                    text = member.fullName,
+                    text = if (member.fullName.length > 30) member.fullName.take(30) + "…" else member.fullName,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
                 Text(
                     text = member.email,

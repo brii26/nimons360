@@ -13,7 +13,7 @@
 		<!-- Page title -->
 		<TextView android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:text="Profile"
-			android:textSize="28sp" android:textStyle="bold"
+			android:textSize="24sp" android:textStyle="bold"
 			android:layout_marginBottom="24dp" />
 
 		<!-- Profile card -->
@@ -54,6 +54,7 @@
 					android:layout_height="wrap_content"
 					android:layout_marginTop="16dp" android:textSize="20sp"
 					android:textStyle="bold" android:textColor="?attr/colorOnSurface"
+					android:gravity="center" android:textAlignment="center"
 					tools:text="Matthew Ivan Widjaja" />
 
 				<!-- Email -->
@@ -70,8 +71,9 @@
 
 		<!-- Back to home button -->
 		<com.google.android.material.button.MaterialButton
-			android:id="@+id/back_home_button" style="@style/Button.Outlined"
-			android:layout_marginTop="24dp" android:text="Back to Home" />
+			android:id="@+id/back_home_button" style="@style/Button.Filled"
+			android:layout_marginTop="24dp" android:text="Back to Home"
+			app:backgroundTint="@color/nimons_green" />
 
 		<!-- Sign out button -->
 		<com.google.android.material.button.MaterialButton

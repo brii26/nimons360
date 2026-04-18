@@ -55,11 +55,11 @@ class ProfileFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     state.profile?.let { profile ->
-                        requireBinding().profileName.text = profile.fullName
+                        requireBinding().profileName.text = if (profile.fullName.length > 40) profile.fullName.take(40) + "…" else profile.fullName
                         requireBinding().profileEmail.text = profile.email
                         requireBinding().profileAvatar.setLetter(
                             profile.fullName.firstOrNull()?.toString() ?: "?",
-                            requireContext().getColor(android.R.color.black),
+                            requireContext().getColor(R.color.profile_avatar_blue),
                         )
                     }
 

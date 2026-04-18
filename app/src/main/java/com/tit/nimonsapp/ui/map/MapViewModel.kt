@@ -9,7 +9,6 @@ import com.tit.nimonsapp.data.repository.AuthRepository
 import com.tit.nimonsapp.data.repository.FamilyRepository
 import com.tit.nimonsapp.ui.common.AuthenticatedRefreshableViewModel
 import com.tit.nimonsapp.ui.common.UiResourceMeta
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -88,6 +87,29 @@ class MapViewModel(
                     ),
             )
         }
+        if (uiState.value.isSocketConnected && isLocationSending) {
+            sendPresence()
+        }
+    }
+
+    private fun sendPresence() {
+        val state = uiState.value
+        val location = state.currentLocation
+        if (location.latitude == 0.0 || location.longitude == 0.0) return
+
+        val payload =
+            JSONObject().apply {
+                put("name", state.currentUserProfile?.fullName ?: "Me")
+                put("latitude", location.latitude)
+                put("longitude", location.longitude)
+                put("rotation", location.rotation)
+                put("batteryLevel", location.batteryLevel)
+                put("isCharging", location.isCharging)
+                put("internetStatus", if (location.internetStatus == "wifi") "wifi" else "mobile")
+                put("metadata", JSONObject())
+            }
+        Log.d("NIMONS_WS", "sending presence: $payload")
+        webSocketRepository.sendLocationUpdate(payload)
     }
 
     fun startObservingWebSocket() {
@@ -126,39 +148,6 @@ class MapViewModel(
         if (isLocationSending) return
         if (!hasGpsPermission) return
         isLocationSending = true
-
-        viewModelScope.launch {
-            while (isLocationSending) {
-                val state = uiState.value
-                val location = state.currentLocation
-
-                if (location.latitude == 0.0 || location.longitude == 0.0) {
-                    Log.d("NIMONS_WS", "skip send: invalid coordinate ${location.latitude}, ${location.longitude}")
-                    delay(1000)
-                    continue
-                }
-
-                val normalizedInternetStatus =
-                    if (location.internetStatus == "wifi") "wifi" else "mobile"
-
-                val payload =
-                    JSONObject().apply {
-                        put("name", state.currentUserProfile?.fullName ?: "Me")
-                        put("latitude", location.latitude)
-                        put("longitude", location.longitude)
-                        put("rotation", location.rotation)
-                        put("batteryLevel", location.batteryLevel)
-                        put("isCharging", location.isCharging)
-                        put("internetStatus", normalizedInternetStatus)
-                        put("metadata", JSONObject())
-                    }
-
-                Log.d("NIMONS_WS", "sending presence: $payload")
-                webSocketRepository.sendLocationUpdate(payload)
-
-                delay(1000)
-            }
-        }
     }
 
     private fun handleMemberPresenceUpdated(payload: JSONObject?) {

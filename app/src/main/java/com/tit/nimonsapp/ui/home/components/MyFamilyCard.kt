@@ -13,6 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,12 +26,13 @@ fun myFamilyCard(
     family: GetMyFamiliesResponseDto,
     onClick: () -> Unit,
 ) {
+    val shape = RoundedCornerShape(20.dp)
     Card(
         onClick = onClick,
-        modifier = Modifier.width(176.dp).aspectRatio(0.82f),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        modifier = Modifier.width(176.dp).aspectRatio(0.82f).shadow(elevation = 3.dp, shape = shape),
+        shape = shape,
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -38,7 +41,7 @@ fun myFamilyCard(
             iconImage(iconUrl = family.iconUrl)
 
             Text(
-                text = family.name,
+                text = if (family.name.length > 30) family.name.take(30) + "…" else family.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 2,

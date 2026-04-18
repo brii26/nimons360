@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sessionRepository: SessionRepository
     private lateinit var networkMonitor: NetworkMonitor
     private var isOffline: Boolean = false
+    private var previousDestinationId: Int? = null
 
     private val ignoreNetworkPopupDestinations =
         setOf(
@@ -119,13 +121,30 @@ class MainActivity : AppCompatActivity() {
 
         binding.bottomNav.setupWithNavController(navController)
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            binding.bottomNav.visibility =
-                if (destination.id in bottomNavDestinations) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
+        navController.addOnDestinationChangedListener { controller, destination, _ ->
+            val isBottomNav = destination.id in bottomNavDestinations
+            val wasBottomNav = previousDestinationId in bottomNavDestinations
+
+            when {
+                isBottomNav && wasBottomNav -> {
                 }
+                isBottomNav && !wasBottomNav -> {
+                    controller.currentBackStackEntry?.lifecycle?.addObserver(
+                        LifecycleEventObserver { _, event ->
+                            if (event == Lifecycle.Event.ON_RESUME) {
+                                binding.bottomNav.visibility = View.VISIBLE
+                                binding.bottomNavDivider.visibility = View.VISIBLE
+                            }
+                        },
+                    )
+                }
+                else -> {
+                    binding.bottomNav.visibility = View.GONE
+                    binding.bottomNavDivider.visibility = View.GONE
+                }
+            }
+
+            previousDestinationId = destination.id
 
             if (destination.id !in ignoreNetworkPopupDestinations && isOffline) {
                 showDisconnectedPopup()

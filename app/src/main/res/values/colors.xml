@@ -11,7 +11,12 @@
 	<!-- Brand -->
 	<color name="nimons_green">#4CAF50</color>
 	<color name="nimons_green_dark">#3ab02c</color>
+	<color name="nimons_green_container">#C8E6C9</color>
+	<color name="nimons_on_green_container">#1B5E20</color>
 	<color name="nimons_yellow">#FFD700</color>
+
+	<color name="nimons_bg">#F2F2F2</color>
+	<color name="profile_avatar_blue">#1976D2</color>
 
 	<!-- Surface & Neutral -->
 	<color name="surface_light">#F8F9FA</color>
