@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -148,7 +149,9 @@ class MapFragment :
             map.uiSettings.isLogoEnabled = false
             map.uiSettings.isAttributionEnabled = true
 
-            // optional: refresh markers once map is really ready
+            map.uiSettings.setCompassGravity(Gravity.BOTTOM or Gravity.END)
+            map.uiSettings.setCompassMargins(0, 0, 40, 240)
+
             updateOtherUsersMarkers(viewModel.getFilteredUsers())
             val currentLocation = viewModel.uiState.value.currentLocation
             if (currentLocation.latitude != 0.0 && currentLocation.longitude != 0.0) {
@@ -164,7 +167,6 @@ class MapFragment :
                 Manifest.permission.ACCESS_FINE_LOCATION,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // this was missing before
             viewModel.setGpsPermissionGranted(true)
             startLocationUpdates()
         } else {
@@ -186,7 +188,6 @@ class MapFragment :
                 viewLifecycleOwner.lifecycleScope.launch {
                     locationRepository.currentLocation.collect { location ->
                         if (location.latitude != 0.0 && location.longitude != 0.0) {
-                            Log.d("NIMONS_MAP", "location -> ${location.latitude}, ${location.longitude}, ${location.internetStatus}")
                             viewModel.updateCurrentLocation(
                                 location.latitude,
                                 location.longitude,
@@ -313,7 +314,7 @@ class MapFragment :
         }
 
         users.forEach { (userId, user) ->
-            if (userId == myId) return@forEach // Skip if it's current user (already handled)
+            if (userId == myId) return@forEach
 
             val position = LatLng(user.latitude, user.longitude)
 
@@ -324,7 +325,7 @@ class MapFragment :
                     MapMarkerView(requireContext(), MapMarkerView.MarkerType.OTHER_USER).apply {
                         setMarkerData(
                             user.fullName.take(1).uppercase(),
-                            ContextCompat.getColor(requireContext(), R.color.nimons_green),
+                            getMarkerColor(userId),
                         )
                     }
 
@@ -342,6 +343,23 @@ class MapFragment :
         }
     }
 
+    private fun getMarkerColor(userId: Int): Int {
+        val colors =
+            arrayOf(
+                R.color.avatar_1,
+                R.color.avatar_2,
+                R.color.avatar_3,
+                R.color.avatar_4,
+                R.color.avatar_5,
+                R.color.avatar_6,
+                R.color.avatar_7,
+                R.color.avatar_8,
+                R.color.avatar_9,
+            )
+        val colorRes = colors[Math.abs(userId) % colors.size]
+        return ContextCompat.getColor(requireContext(), colorRes)
+    }
+
     private fun showUserInfoBottomSheet(user: UserOnMap) {
         dismissUserInfoBottomSheet()
 
@@ -355,12 +373,10 @@ class MapFragment :
             }
     }
 
-    // Show current user's info in bottom sheet (clicked on own marker)
     private fun showMyInfoBottomSheet() {
         dismissUserInfoBottomSheet()
 
         val currentUser = viewModel.uiState.value.currentLocation
-        // Get current location and profile (loaded from /api/me)
         val profile = viewModel.uiState.value.currentUserProfile
         val myUserOnMap =
             UserOnMap(

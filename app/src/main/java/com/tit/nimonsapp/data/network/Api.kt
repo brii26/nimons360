@@ -86,14 +86,12 @@ class AuthInterceptor(
         val request = chain.request()
         val response = chain.proceed(request)
 
-        // Session expired (409) or Unauthorized (401)
         if (response.code == 409 || response.code == 401) {
             val sessionRepository = SessionRepository(context)
             runBlocking {
                 sessionRepository.clearToken()
             }
 
-            // Redirect to MainActivity which should handle the login routing if no token
             val intent =
                 Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

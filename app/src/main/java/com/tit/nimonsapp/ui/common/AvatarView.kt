@@ -9,12 +9,6 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.tit.nimonsapp.R
 
-/*
- * pake AvatarView custom view:
- * <com.tit.nimonsapp.ui.common.AvatarView android:id="@+id/avatar"
- *     app:avatarShape="circle" app:avatarText="A" app:avatarBgColor="?attr/colorPrimary"/>
- * set dari code: avatar.setLetter("B", color) atau avatar.setImage { Coil.load(it, url) }
- */
 class AvatarView
     @JvmOverloads
     constructor(
@@ -25,7 +19,6 @@ class AvatarView
         private val ivImage: ImageView
         private val tvLetter: TextView
 
-        // 0 = circle, 1 = rounded_square
         private var shape: Int = 0
 
         init {
@@ -48,7 +41,6 @@ class AvatarView
             }
         }
 
-        // set initial letter + warna bg
         fun setLetter(
             letter: String,
             bgColor: Int,
@@ -59,7 +51,6 @@ class AvatarView
             applyBackground(bgColor)
         }
 
-        // set gambar via loader: avatar.setImage { Coil.load(it, url) }
         fun setImage(loader: (ImageView) -> Unit) {
             tvLetter.visibility = GONE
             ivImage.visibility = VISIBLE

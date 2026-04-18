@@ -37,7 +37,7 @@
 						android:layout_height="88dp" app:avatarShape="circle"
 						app:avatarText="?" />
 
-					<!-- Badge: half inside, half outside bottom-right corner -->
+					<!-- Badge -->
 					<ImageButton android:id="@+id/edit_avatar_button"
 						android:layout_width="28dp" android:layout_height="28dp"
 						android:layout_gravity="bottom|end"
@@ -68,12 +68,12 @@
 
 		</com.google.android.material.card.MaterialCardView>
 
-		<!-- Back to Home button -->
+		<!-- Back to home button -->
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/back_home_button" style="@style/Button.Outlined"
 			android:layout_marginTop="24dp" android:text="Back to Home" />
 
-		<!-- Sign Out button -->
+		<!-- Sign out button -->
 		<com.google.android.material.button.MaterialButton
 			android:id="@+id/logout_button" style="@style/Button.Destructive"
 			android:layout_marginTop="5dp" android:text="Sign Out" />

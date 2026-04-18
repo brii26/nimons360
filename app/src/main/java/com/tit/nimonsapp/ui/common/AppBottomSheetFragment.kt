@@ -1,9 +1,3 @@
-// Cara penggunaan:
-// class MySheet : AppBottomSheetFragment(R.layout.my_content_layout) {
-//     override fun onViewCreated(view: View, savedInstanceState: Bundle?) { ... }
-// }
-// MySheet().show(childFragmentManager, null)
-
 package com.tit.nimonsapp.ui.common
 
 import android.os.Bundle

@@ -45,7 +45,6 @@ class IconPickerAdapter(
         fun bind(url: String) {
             binding.ivIconItem.load(url)
 
-            // Highlight if selected
             binding.root.isSelected = url == selectedUrl
 
             binding.root.setOnClickListener {

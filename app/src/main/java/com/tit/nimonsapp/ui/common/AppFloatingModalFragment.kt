@@ -1,7 +1,3 @@
-// Cara penggunaan:
-// class MyModal : AppFloatingModalFragment(R.layout.my_content_layout) { ... }
-// MyModal().show(childFragmentManager, null)
-
 package com.tit.nimonsapp.ui.common
 
 import android.os.Bundle

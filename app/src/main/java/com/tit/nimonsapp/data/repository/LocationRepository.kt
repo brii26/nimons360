@@ -46,8 +46,6 @@ class LocationRepository(
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var sensorManager: SensorManager
-
-    // Sensor data + orientation/rotation buffers
     private val accelerometerReading = FloatArray(3)
     private val magnetometerReading = FloatArray(3)
     private val rotationMatrix = FloatArray(9)
@@ -64,7 +62,6 @@ class LocationRepository(
                             internetStatus = getInternetStatus(),
                         )
                     }
-                    // printing logcat
                     val current = _currentLocation.value
                     Log.d("NIMONS_GPS", "Lat: ${current.latitude}, Lon: ${current.longitude}, Rot: ${current.rotation}")
                 }
@@ -95,7 +92,6 @@ class LocationRepository(
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-        // Start battery monitoring langsung pas init
         val batteryIntentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         batteryReceiver =
             object : BroadcastReceiver() {
@@ -124,7 +120,6 @@ class LocationRepository(
     fun startLocationUpdates() {
         if (!hasLocationPermission()) return
 
-        // 1s Interval
         val locationRequest =
             LocationRequest
                 .Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
@@ -133,7 +128,6 @@ class LocationRepository(
 
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
-        // Sensor di-register only pas active to save battery
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
@@ -144,7 +138,6 @@ class LocationRepository(
     private fun updateOrientation() {
         if (SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerReading, magnetometerReading)) {
             SensorManager.getOrientation(rotationMatrix, orientationAngles)
-            // Azimuth is orientationAngles[0]. Convert to degrees 0-360
             var azimuth = Math.toDegrees(orientationAngles[0].toDouble()).toFloat()
             if (azimuth < 0f) azimuth += 360f
 

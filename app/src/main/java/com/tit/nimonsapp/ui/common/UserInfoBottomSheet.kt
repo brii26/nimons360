@@ -36,31 +36,24 @@ class UserInfoBottomSheet(
         tvWifiValue = view.findViewById(R.id.tvWifiValue)
         ivWifiIcon = view.findViewById(R.id.ivWifiIcon)
 
-        // Close when clicking outside
         setOnDismissListener { }
     }
 
     fun setUser(user: UserOnMap) {
-        // Set avatar with first letter of name
         avatarView.setLetter(
             user.fullName.take(1).uppercase(),
             ContextCompat.getColor(context, R.color.nimons_green),
         )
 
-        // Set name and email
         tvUserName.text = user.fullName
         tvUserEmail.text = user.email
 
-        // Set battery
         tvBatteryValue.text = "${user.batteryLevel}%"
 
-        // Set charging icon
         ivCharging.visibility = if (user.isCharging) View.VISIBLE else View.GONE
 
-        // Set location
         tvLocationValue.text = String.format("%.3f, %.3f", user.latitude, user.longitude)
 
-        // Set network status
         tvWifiValue.text =
             when (user.internetStatus) {
                 "wifi" -> "WiFi"
@@ -68,23 +61,17 @@ class UserInfoBottomSheet(
                 else -> "Unknown"
             }
 
-        // Set WiFi icon color based on status
         ivWifiIcon.setColorFilter(
             when (user.internetStatus) {
                 "wifi" -> Color.parseColor("#4CAF50")
-
-                // Green
                 "mobile" -> Color.parseColor("#FF9800")
-
-                // Orange
-                else -> Color.parseColor("#9E9E9E") // Gray
+                else -> Color.parseColor("#9E9E9E")
             },
         )
     }
 
     override fun show() {
         super.show()
-        // Make dismiss on touch outside
         setCancelable(true)
     }
 }

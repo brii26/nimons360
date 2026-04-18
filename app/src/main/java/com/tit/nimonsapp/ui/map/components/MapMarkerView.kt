@@ -11,9 +11,6 @@ import androidx.core.content.ContextCompat
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.ui.common.AvatarView
 
-/**
- * Custom marker view untuk di MapLibre
- */
 class MapMarkerView
     @JvmOverloads
     constructor(
@@ -40,7 +37,6 @@ class MapMarkerView
 
             avatarView = findViewById(R.id.marker_avatar)
 
-            // Set container size yang cukup besar agar panah tidak kepotong
             val size =
                 when (markerType) {
                     MarkerType.CURRENT_USER -> 80f.dpToPx(context).toInt()
@@ -48,7 +44,6 @@ class MapMarkerView
                 }
             layoutParams = LayoutParams(size, size)
 
-            // Pastikan tidak ada clipping di level parent
             clipChildren = false
             clipToPadding = false
 

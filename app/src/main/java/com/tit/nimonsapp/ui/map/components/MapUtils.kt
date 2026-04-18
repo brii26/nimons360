@@ -8,11 +8,7 @@ object MapUtils {
         longitude: Double,
     ): LatLng = LatLng(latitude, longitude)
 
-    fun calculateRotationFromNorth(azimuth: Double): Float {
-        // Azimuth from sensors is 0=North, 90=East
-        // MapLibre rotation is also 0=North, clockwise positive
-        return azimuth.toFloat()
-    }
+    fun calculateRotationFromNorth(azimuth: Double): Float = azimuth.toFloat()
 
     const val DEFAULT_ZOOM = 15.0
     const val MIN_ZOOM = 10.0
