@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -79,14 +80,12 @@ private fun discoverFamilyRow(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
+            Spacer(modifier = Modifier.height(4.dp))
+            memberAvatarRow(
+                labels = family.members.map { initialsFromName(it.fullName) },
+                maxVisible = 3,
+            )
         }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        memberAvatarRow(
-            labels = family.members.map { initialsFromName(it.fullName) },
-            maxVisible = 3,
-        )
 
         Spacer(modifier = Modifier.width(10.dp))
 

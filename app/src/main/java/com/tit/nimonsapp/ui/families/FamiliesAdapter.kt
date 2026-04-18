@@ -1,14 +1,15 @@
 package com.tit.nimonsapp.ui.families
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import coil.transform.RoundedCornersTransformation
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.databinding.ItemFamilyBinding
+import kotlin.math.abs
 
 class FamiliesAdapter(
     private val onPinClick: (Int) -> Unit,
@@ -49,11 +50,16 @@ class FamiliesAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: FamilyItem) {
             binding.familyName.text = item.family.name
+            val bgColors = listOf(
+                "#FFCDD2", "#FFF9C4", "#C8E6C9", "#BBDEFB",
+                "#E1BEE7", "#FFE0B2", "#B2EBF2", "#F8BBD0",
+            )
+            val hex = bgColors[abs(item.family.iconUrl.hashCode()) % bgColors.size]
+            binding.iconBgCard.setCardBackgroundColor(Color.parseColor(hex))
             binding.ivFamilyIcon.load(item.family.iconUrl) {
                 crossfade(true)
                 placeholder(R.drawable.ic_app)
                 error(R.drawable.ic_app)
-                transformations(RoundedCornersTransformation(32f))
             }
             bindPinState(item.isPinned)
             binding.pinButton.setOnClickListener { onPinClick(item.family.id) }
