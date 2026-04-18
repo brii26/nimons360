@@ -1,60 +1,62 @@
 package com.tit.nimonsapp.data.repository
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.io.IOException
 
-private const val SESSION_DATASTORE_NAME = "session"
-
-private val Context.sessionDataStore by preferencesDataStore(
-    name = SESSION_DATASTORE_NAME,
-)
+private const val SHARED_PREFS_NAME = "encrypted_session"
 
 class SessionRepository(
     private val context: Context,
 ) {
     companion object {
-        private val TOKEN_KEY: Preferences.Key<String> =
-            stringPreferencesKey("token")
+        private const val TOKEN_KEY = "token"
     }
 
-    val tokenFlow: Flow<String?> =
-        context.sessionDataStore.data
-            .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
-            }.map { preferences ->
-                preferences[TOKEN_KEY]
-            }
-
-    suspend fun saveToken(token: String) {
-        context.sessionDataStore.edit { preferences ->
-            preferences[TOKEN_KEY] = token
-        }
+    private val masterKey: MasterKey by lazy {
+        MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
     }
 
-    suspend fun getToken(): String? = tokenFlow.first()
-
-    suspend fun clearToken() {
-        context.sessionDataStore.edit { preferences ->
-            preferences.remove(TOKEN_KEY)
-        }
+    private val encryptedSharedPreferences: SharedPreferences by lazy {
+        EncryptedSharedPreferences.create(
+            context,
+            SHARED_PREFS_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
-    suspend fun hasToken(): Boolean = getToken() != null
+    private val _tokenFlow = MutableStateFlow<String?>(null)
+    val tokenFlow: Flow<String?> = _tokenFlow.asStateFlow()
 
-    suspend fun getBearerToken(): String? {
+    init {
+        // Initialize the flow with current token value
+        _tokenFlow.value = getToken()
+    }
+
+    fun saveToken(token: String) {
+        encryptedSharedPreferences.edit().putString(TOKEN_KEY, token).apply()
+        _tokenFlow.value = token
+    }
+
+    fun getToken(): String? = encryptedSharedPreferences.getString(TOKEN_KEY, null)
+
+    fun clearToken() {
+        encryptedSharedPreferences.edit().remove(TOKEN_KEY).apply()
+        _tokenFlow.value = null
+    }
+
+    fun hasToken(): Boolean = getToken() != null
+
+    fun getBearerToken(): String? {
         val token = getToken() ?: return null
         return "Bearer $token"
     }
