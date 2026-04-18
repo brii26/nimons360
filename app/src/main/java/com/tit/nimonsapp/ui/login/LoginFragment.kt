@@ -55,6 +55,7 @@ class LoginFragment : Fragment() {
                     count: Int,
                 ) {
                     viewModel.onEmailChanged(s?.toString().orEmpty())
+                    viewModel.clearCountdown()
                 }
 
                 override fun afterTextChanged(s: Editable?) = Unit
@@ -142,6 +143,12 @@ class LoginFragment : Fragment() {
                         }
                     }
 
+                    // Show countdown if rate limited
+                    if (state.remainingSeconds != null && state.remainingSeconds!! > 0) {
+                        val remainingText = "Coba lagi dalam ${state.remainingSeconds!!} detik"
+                        requireBinding().emailInput.setError(remainingText)
+                    }
+
                     if (state.isLoggedIn) {
                         findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                         viewModel.consumeLoginSuccess()
@@ -154,5 +161,9 @@ class LoginFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+
+    private fun clearError() {
+        viewModel.clearError()
     }
 }
