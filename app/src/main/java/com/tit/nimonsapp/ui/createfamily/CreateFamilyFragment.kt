@@ -1,5 +1,6 @@
 package com.tit.nimonsapp.ui.createfamily
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +17,7 @@ import coil.load
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.databinding.FragmentCreateFamiliesBinding
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class CreateFamilyFragment : Fragment() {
     private var binding: FragmentCreateFamiliesBinding? = null
@@ -79,6 +81,13 @@ class CreateFamilyFragment : Fragment() {
                         crossfade(true)
                         placeholder(R.drawable.ic_app)
                     }
+
+                    val bgColors = listOf(
+                        "#FFCDD2", "#FFF9C4", "#C8E6C9", "#BBDEFB",
+                        "#E1BEE7", "#FFE0B2", "#B2EBF2", "#F8BBD0",
+                    )
+                    val hex = bgColors[abs(state.iconUrl.hashCode()) % bgColors.size]
+                    requireBinding().previewIconCard.setCardBackgroundColor(Color.parseColor(hex))
 
                     requireBinding().btnCreate.isEnabled =
                         state.name.isNotBlank() && !state.meta.isLoading
