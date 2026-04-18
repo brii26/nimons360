@@ -24,7 +24,7 @@ class MyDatabaseHelper(
             """
             CREATE TABLE ${PinnedFamily.TABLE_PINNED} (
                 ${PinnedFamily.ID} INTEGER PRIMARY KEY AUTOINCREMENT,
-                ${PinnedFamily.FAMILY_ID} INTEGER
+                ${PinnedFamily.FAMILY_ID} INTEGER UNIQUE
             )
             """.trimIndent(),
         )
