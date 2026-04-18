@@ -45,6 +45,7 @@ class LoginViewModel(
             updateState {
                 withMeta(meta.copy(errorMessage = "Invalid email format"))
             }
+            return
         }
 
         if (password.isBlank()) {
