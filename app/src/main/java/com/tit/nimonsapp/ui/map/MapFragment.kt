@@ -119,20 +119,7 @@ class MapFragment :
 
         viewModel.loadCurrentUserProfile()
         viewModel.loadFamilyMembers()
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val sessionRepository =
-                com.tit.nimonsapp.data.repository
-                    .SessionRepository(requireContext())
-            val token = sessionRepository.getToken()
-
-            if (!token.isNullOrBlank()) {
-                viewModel.connectWebSocket(token)
-                viewModel.startObservingWebSocket()
-            } else {
-                Log.e("NIMONS_WS_RAW", "No token found, websocket not connected")
-            }
-        }
+        viewModel.startObservingWebSocket()
 
         requestLocationPermission()
     }

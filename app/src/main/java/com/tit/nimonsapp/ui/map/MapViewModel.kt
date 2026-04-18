@@ -28,11 +28,6 @@ class MapViewModel(
     private var isLocationSending = false
     private var isObservingSocket = false
 
-    fun connectWebSocket(token: String) {
-        Log.d("NIMONS_WS_RAW", "CALLING CONNECT")
-        webSocketRepository.connect(token)
-    }
-
     fun setGpsPermissionGranted(granted: Boolean) {
         hasGpsPermission = granted
         if (granted && uiState.value.isSocketConnected && !isLocationSending) {
