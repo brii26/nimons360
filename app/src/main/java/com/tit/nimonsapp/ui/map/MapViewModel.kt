@@ -175,6 +175,10 @@ class MapViewModel(
             if (userId == -1) return
 
             if (userId !in uiState.value.myFamilyMemberIds) {
+                Log.d("NIMONS_WS", "Ignoring user $userId - not in my families")
+                return
+            }
+
             val latitude = payload.optDouble("latitude", 0.0)
             val longitude = payload.optDouble("longitude", 0.0)
             if (latitude == 0.0 || longitude == 0.0) {
@@ -232,10 +236,22 @@ class MapViewModel(
 
         if (query.isEmpty()) return currentUsers
 
+        val sanitizedQuery = sanitizeSearchQuery(query)
+
         return currentUsers.filter { (_, user) ->
-            user.fullName.contains(query, ignoreCase = true) ||
-                user.email.contains(query, ignoreCase = true)
+            user.fullName.contains(sanitizedQuery, ignoreCase = true) ||
+                user.email.contains(sanitizedQuery, ignoreCase = true)
         }
+    }
+
+    private fun sanitizeSearchQuery(query: String): String {
+        // Escape regex special characters
+        val specialChars = listOf("*", "+", "?", "[", "]", "{", "}", "(", ")")
+        var result = query
+        for (char in specialChars) {
+            result = result.replace(char, "\\$char")
+        }
+        return result
     }
 
     override fun refresh() {
