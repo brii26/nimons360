@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.jetbrains.kotlinx.coroutines.android)
     implementation(libs.squareup.okhttp3.logging.interceptor)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
