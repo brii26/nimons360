@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,8 +14,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.databinding.FragmentFamiliesBinding
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class FamiliesFragment : Fragment() {
@@ -25,6 +29,8 @@ class FamiliesFragment : Fragment() {
 
     private lateinit var pinnedAdapter: FamiliesAdapter
     private lateinit var allFamiliesAdapter: FamiliesAdapter
+
+    private var searchDebounceJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,35 +52,45 @@ class FamiliesFragment : Fragment() {
     }
 
     private fun setupAdapters() {
+        val sharedPool = RecyclerView.RecycledViewPool()
+
         pinnedAdapter = FamiliesAdapter(
             onPinClick = { id -> viewModel.togglePinned(id) },
-            onItemClick = { id -> navigateToDetail(id) }
+            onItemClick = { id -> navigateToDetail(id) },
         )
-        
         allFamiliesAdapter = FamiliesAdapter(
             onPinClick = { id -> viewModel.togglePinned(id) },
-            onItemClick = { id -> navigateToDetail(id) }
+            onItemClick = { id -> navigateToDetail(id) },
         )
 
         binding.pinnedRecycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = pinnedAdapter
+            setRecycledViewPool(sharedPool)
+            setHasFixedSize(false)
         }
-
         binding.allFamiliesRecycler.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = allFamiliesAdapter
+            setRecycledViewPool(sharedPool)
+            setHasFixedSize(false)
         }
     }
 
     private fun navigateToDetail(familyId: Int) {
-        val bundle = bundleOf("familyId" to familyId)
-        findNavController().navigate(R.id.action_familiesFragment_to_familyDetailFragment, bundle)
+        findNavController().navigate(
+            R.id.action_familiesFragment_to_familyDetailFragment,
+            bundleOf("familyId" to familyId),
+        )
     }
 
     private fun setupListeners() {
         binding.searchInput.addTextChangedListener { text ->
-            viewModel.updateSearchQuery(text?.toString() ?: "")
+            searchDebounceJob?.cancel()
+            searchDebounceJob = viewLifecycleOwner.lifecycleScope.launch {
+                delay(200)
+                viewModel.updateSearchQuery(text?.toString() ?: "")
+            }
         }
 
         binding.filterChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
@@ -88,20 +104,33 @@ class FamiliesFragment : Fragment() {
         binding.fabAddFamily.setOnClickListener {
             findNavController().navigate(R.id.action_familiesFragment_to_createFamilyFragment)
         }
+
+        // Trigger loadMore pas scroll kebawah
+        binding.nestedScrollView.setOnScrollChangeListener(
+            NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+                val contentHeight = v.getChildAt(0).measuredHeight
+                val viewHeight = v.measuredHeight
+                if (scrollY + viewHeight >= contentHeight - 200) {
+                    viewModel.loadMore()
+                }
+            },
+        )
     }
 
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    pinnedAdapter.setPinnedIds(state.pinnedFamilyIds)
-                    pinnedAdapter.submitList(state.pinnedFamilies)
-                    
-                    allFamiliesAdapter.setPinnedIds(state.pinnedFamilyIds)
-                    allFamiliesAdapter.submitList(state.filteredAllFamilies)
-                    
-                    binding.pinnedLabel.visibility = if (state.pinnedFamilies.isEmpty()) View.GONE else View.VISIBLE
-                    binding.pinnedRecycler.visibility = if (state.pinnedFamilies.isEmpty()) View.GONE else View.VISIBLE
+                    val pinned = state.pinnedItems
+                    pinnedAdapter.submitList(pinned)
+                    allFamiliesAdapter.submitList(state.pagedItems)
+
+                    val hasPinned = pinned.isNotEmpty()
+                    binding.pinnedLabel.visibility = if (hasPinned) View.VISIBLE else View.GONE
+                    binding.pinnedRecycler.visibility = if (hasPinned) View.VISIBLE else View.GONE
+
+                    binding.loadingFooter.visibility =
+                        if (state.hasMoreItems) View.VISIBLE else View.GONE
                 }
             }
         }
@@ -109,6 +138,7 @@ class FamiliesFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        searchDebounceJob?.cancel()
         _binding = null
     }
 }
