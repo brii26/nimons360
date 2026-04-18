@@ -45,8 +45,8 @@ class UserInfoBottomSheet(
             ContextCompat.getColor(context, R.color.nimons_green),
         )
 
-        tvUserName.text = user.fullName
-        tvUserEmail.text = user.email
+        tvUserName.text = user.fullName.let { if (it.length > 30) it.take(30) + "…" else it }
+        tvUserEmail.text = user.email.let { if (it.length > 35) it.take(35) + "…" else it }
 
         tvBatteryValue.text = "${user.batteryLevel}%"
 

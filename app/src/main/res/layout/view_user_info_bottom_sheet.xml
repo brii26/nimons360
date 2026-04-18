@@ -23,16 +23,18 @@
 			android:layout_marginStart="12dp">
 
 			<TextView android:id="@+id/tvUserName"
-				android:layout_width="wrap_content"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content" android:textSize="18sp"
 				android:textStyle="bold" android:textColor="@android:color/black"
+				android:maxLines="1" android:ellipsize="end"
 				tools:text="Labpro ITB" />
 
 			<TextView android:id="@+id/tvUserEmail"
-				android:layout_width="wrap_content"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content" android:textSize="14sp"
 				android:textColor="@color/section_label"
 				android:layout_marginTop="2dp"
+				android:maxLines="1" android:ellipsize="end"
 				tools:text="labpro@std.stei.itb.ac.id" />
 
 		</LinearLayout>
