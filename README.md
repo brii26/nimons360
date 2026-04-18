@@ -46,3 +46,13 @@ kotlin formatter
 ./gradlew spotlessApply
 ./gradlew spotlessCheck
 ```
+
+new workflow
+```
+QT_QPA_PLATFORM=xcb emulator -avd Medium_Phone -gpu off -no-snapshot
+QT_QPA_PLATFORM=xcb emulator -avd Medium_Phone2 -gpu off -no-snapshot
+./gradlew assembleDebug
+adb devices
+adb -s emulator-5554 install -r app/build/outputs/apk/debug/app-debug.apk
+adb -s emulator-5556 install -r app/build/outputs/apk/debug/app-debug.apk
+```

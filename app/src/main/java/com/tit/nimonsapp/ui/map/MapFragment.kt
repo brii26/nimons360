@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ import com.tit.nimonsapp.data.repository.DeviceLocation
 import com.tit.nimonsapp.data.repository.LocationRepository
 import com.tit.nimonsapp.ui.common.UserInfoBottomSheet
 import com.tit.nimonsapp.ui.map.components.MapMarkerView
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.maplibre.android.MapLibre
@@ -45,12 +47,15 @@ class MapFragment :
     private lateinit var locationRepository: LocationRepository
     private lateinit var viewModel: MapViewModel
 
-    private val markers = mutableMapOf<Int, MarkerView>() // userId -> Marker
+    private val markers = mutableMapOf<Int, MarkerView>()
     private var currentUserMarker: MarkerView? = null
     private var currentUserMarkerView: MapMarkerView? = null
 
     private var userInfoBottomSheet: UserInfoBottomSheet? = null
     private lateinit var mapSearchEditText: EditText
+
+    private var locationCollectionJob: Job? = null
+    private var offlineCleanupJob: Job? = null
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -70,31 +75,31 @@ class MapFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         MapLibre.getInstance(requireContext())
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        mapSearchEditText = view.findViewById<EditText>(R.id.et_search)
-            ?: view.findViewById<View>(R.id.map_search_bar)?.findViewById<EditText>(R.id.et_search)
-            ?: EditText(requireContext())
+        mapSearchEditText =
+            view.findViewById<EditText>(R.id.et_search)
+                ?: view.findViewById<View>(R.id.map_search_bar)?.findViewById(R.id.et_search)
+                ?: EditText(requireContext())
 
-        mapView = view.findViewById(R.id.mapView) ?: MapView(requireContext()).apply {
-            val params =
-                FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                )
-            layoutParams = params
-            (view as FrameLayout).addView(this)
-        }
+        mapView =
+            view.findViewById(R.id.mapView) ?: MapView(requireContext()).apply {
+                val params =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                    )
+                layoutParams = params
+                (view as FrameLayout).addView(this)
+            }
 
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
         return view
     }
 
-    // Initialize location tracking and observe WebSocket messages
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
@@ -104,16 +109,28 @@ class MapFragment :
         locationRepository = LocationRepository(requireContext())
         locationRepository.initialize()
 
-        // Use the shared WebSocketRepository from MainActivity
         val factory = MapViewModelFactory(requireActivity().application, MainActivity.webSocketRepository)
         viewModel = ViewModelProvider(this, factory)[MapViewModel::class.java]
 
         observeViewModel()
         setupSearchBar()
 
-        // Load user profile and family members for filtering
         viewModel.loadCurrentUserProfile()
         viewModel.loadFamilyMembers()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val sessionRepository =
+                com.tit.nimonsapp.data.repository
+                    .SessionRepository(requireContext())
+            val token = sessionRepository.getToken()
+
+            if (!token.isNullOrBlank()) {
+                viewModel.connectWebSocket(token)
+                viewModel.startObservingWebSocket()
+            } else {
+                Log.e("NIMONS_WS_RAW", "No token found, websocket not connected")
+            }
+        }
 
         requestLocationPermission()
     }
@@ -131,11 +148,14 @@ class MapFragment :
     }
 
     private fun requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(
+        if (
+            ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION,
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            // this was missing before
+            viewModel.setGpsPermissionGranted(true)
             startLocationUpdates()
         } else {
             requestPermissionLauncher.launch(
@@ -151,30 +171,34 @@ class MapFragment :
     private fun startLocationUpdates() {
         locationRepository.startLocationUpdates()
 
-        lifecycleScope.launch {
-            locationRepository.currentLocation.collect { location ->
-                if (location.latitude != 0.0 && location.longitude != 0.0) {
-                    viewModel.updateCurrentLocation(
-                        location.latitude,
-                        location.longitude,
-                        location.rotation,
-                        location.batteryLevel,
-                        location.isCharging,
-                        location.internetStatus,
-                    )
-                    updateCurrentUserMarker(location)
+        if (locationCollectionJob == null) {
+            locationCollectionJob =
+                lifecycleScope.launch {
+                    locationRepository.currentLocation.collect { location ->
+                        if (location.latitude != 0.0 && location.longitude != 0.0) {
+                            Log.d("NIMONS_MAP", "location -> ${location.latitude}, ${location.longitude}, ${location.internetStatus}")
+                            viewModel.updateCurrentLocation(
+                                location.latitude,
+                                location.longitude,
+                                location.rotation,
+                                location.batteryLevel,
+                                location.isCharging,
+                                location.internetStatus,
+                            )
+                            updateCurrentUserMarker(location)
+                        }
+                    }
                 }
-            }
         }
 
-        // Start observing WebSocket messages in the ViewModel
-        viewModel.startObservingWebSocket()
-
-        lifecycleScope.launch {
-            while (true) {
-                delay(5000)
-                viewModel.removeOfflineUsers()
-            }
+        if (offlineCleanupJob == null) {
+            offlineCleanupJob =
+                lifecycleScope.launch {
+                    while (true) {
+                        delay(5000)
+                        viewModel.removeOfflineUsers()
+                    }
+                }
         }
     }
 

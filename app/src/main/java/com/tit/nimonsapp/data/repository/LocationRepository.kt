@@ -154,12 +154,14 @@ class LocationRepository(
 
     private fun getInternetStatus(): String {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val nw = cm.activeNetwork ?: return "unknown"
-        val actNw = cm.getNetworkCapabilities(nw) ?: return "unknown"
+        val nw = cm.activeNetwork ?: return "mobile"
+        val actNw = cm.getNetworkCapabilities(nw) ?: return "mobile"
+
         return when {
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "wifi"
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "mobile"
-            else -> "unknown"
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> "mobile"
+            else -> "mobile"
         }
     }
 

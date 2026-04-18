@@ -1,8 +1,8 @@
 package com.tit.nimonsapp.ui.map
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.tit.nimonsapp.data.network.GetMeResponseDto
 import com.tit.nimonsapp.data.network.WebSocketMessageType
 import com.tit.nimonsapp.data.network.WebSocketRepository
 import com.tit.nimonsapp.data.repository.AuthRepository
@@ -10,7 +10,6 @@ import com.tit.nimonsapp.data.repository.FamilyRepository
 import com.tit.nimonsapp.ui.common.AuthenticatedRefreshableViewModel
 import com.tit.nimonsapp.ui.common.UiResourceMeta
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -25,37 +24,37 @@ class MapViewModel(
     private val authRepository = AuthRepository()
     private val familyRepository = FamilyRepository()
 
-    // Track GPS permission state - only send location updates when granted
     private var hasGpsPermission = false
     private var isLocationSending = false
+    private var isObservingSocket = false
 
-    // Load current user profile for "My Info" and to get user ID for filtering.
-    // Set GPS permission status from Fragment.
-    // Dipanggil stlh permission granted to start location updates.
+    fun connectWebSocket(token: String) {
+        Log.d("NIMONS_WS_RAW", "CALLING CONNECT")
+        webSocketRepository.connect(token)
+    }
+
     fun setGpsPermissionGranted(granted: Boolean) {
         hasGpsPermission = granted
-        if (granted && !isLocationSending) {
+        if (granted && uiState.value.isSocketConnected && !isLocationSending) {
             startLocationUpdates()
         }
     }
 
-    /**
-     * Load current user profile for "My Info" and to get user ID for filtering.
-     */
     fun loadCurrentUserProfile() {
         executeAuthenticatedLoad(
             isRefresh = false,
             errorMessageFallback = "Failed to load profile",
             loader = { token -> authRepository.getMe(token) },
             onSuccess = { profile ->
+                Log.d(
+                    "NIMONS_WS",
+                    "profile loaded id=${profile.id} email=${profile.email} fullName=${profile.fullName}",
+                )
                 copy(currentUserProfile = profile)
             },
         )
     }
 
-    /**
-     * Load all family members from all joined families to whitelist who to show on map.
-     */
     fun loadFamilyMembers() {
         executeAuthenticatedLoad(
             isRefresh = false,
@@ -67,14 +66,12 @@ class MapViewModel(
                         .flatMap { family ->
                             family.members.mapNotNull { it.id }
                         }.toSet()
+                Log.d("NIMONS_WS", "family whitelist=$memberIds")
                 copy(myFamilyMemberIds = memberIds)
             },
         )
     }
 
-    /**
-     * Update current device location in local UI state.
-     */
     fun updateCurrentLocation(
         latitude: Double,
         longitude: Double,
@@ -98,27 +95,26 @@ class MapViewModel(
         }
     }
 
-    /**
-     * Start observing WebSocket messages. Connection management is handled at Activity/Global level.
-     */
     fun startObservingWebSocket() {
-        viewModelScope.launch {
-            // Wait for profile and families to be loaded for filtering
-            loadCurrentUserProfile()
-            loadFamilyMembers()
+        if (isObservingSocket) return
+        isObservingSocket = true
 
+        viewModelScope.launch {
             webSocketRepository.observeMessages().collect { message ->
                 when (message.type) {
                     WebSocketMessageType.CONNECTED -> {
+                        Log.d("NIMONS_WS", "socket connected")
                         updateState { copy(isSocketConnected = true) }
-                        startLocationUpdates()
+                        if (hasGpsPermission) startLocationUpdates()
                     }
 
                     WebSocketMessageType.MEMBER_PRESENCE_UPDATED -> {
+                        Log.d("NIMONS_WS", "presence received: ${message.payload}")
                         handleMemberPresenceUpdated(message.payload)
                     }
 
                     WebSocketMessageType.DISCONNECTED -> {
+                        Log.d("NIMONS_WS", "socket disconnected")
                         updateState { copy(isSocketConnected = false) }
                         isLocationSending = false
                     }
@@ -131,67 +127,71 @@ class MapViewModel(
         }
     }
 
-    /**
-     * Periodically send my location to the server via WebSocket.
-     * Only sends updates when GPS permission is granted.
-     */
     private fun startLocationUpdates() {
         if (isLocationSending) return
-        if (!hasGpsPermission) return // Skip if permission denied
+        if (!hasGpsPermission) return
         isLocationSending = true
 
         viewModelScope.launch {
             while (isLocationSending) {
-                // Send location every 1 second until stopped or permission revoked
-                delay(1000)
                 val state = uiState.value
                 val location = state.currentLocation
-                val userName = state.currentUserProfile?.fullName ?: "Me"
+
+                if (location.latitude == 0.0 || location.longitude == 0.0) {
+                    Log.d("NIMONS_WS", "skip send: invalid coordinate ${location.latitude}, ${location.longitude}")
+                    delay(1000)
+                    continue
+                }
+
+                val normalizedInternetStatus =
+                    if (location.internetStatus == "wifi") "wifi" else "mobile"
 
                 val payload =
                     JSONObject().apply {
-                        put("name", userName)
+                        put("name", state.currentUserProfile?.fullName ?: "Me")
                         put("latitude", location.latitude)
                         put("longitude", location.longitude)
                         put("rotation", location.rotation)
                         put("batteryLevel", location.batteryLevel)
                         put("isCharging", location.isCharging)
-                        put("internetStatus", location.internetStatus)
+                        put("internetStatus", normalizedInternetStatus)
                         put("metadata", JSONObject())
                     }
 
+                Log.d("NIMONS_WS", "sending presence: $payload")
                 webSocketRepository.sendLocationUpdate(payload)
+
                 delay(1000)
             }
         }
     }
 
-    // Process incoming presence data. Filter by family members.
     private fun handleMemberPresenceUpdated(payload: JSONObject?) {
         payload ?: return
 
         try {
             val userId = payload.optInt("userId", -1)
+            Log.d("NIMONS_WS", "presence received userId=$userId payload=$payload")
             if (userId == -1) return
 
-            // Filter: Only show users in my family whitelist
-            val currentUserProfile = uiState.value.currentUserProfile
-            val isMe = userId == currentUserProfile?.id
-            val isFamily = userId in uiState.value.myFamilyMemberIds
-
-            if (!isMe && !isFamily) return
+            val latitude = payload.optDouble("latitude", 0.0)
+            val longitude = payload.optDouble("longitude", 0.0)
+            if (latitude == 0.0 || longitude == 0.0) {
+                Log.d("NIMONS_WS", "drop received presence with invalid coordinate for userId=$userId")
+                return
+            }
 
             val userOnMap =
                 UserOnMap(
                     userId = userId,
                     fullName = payload.optString("fullName", "Unknown"),
                     email = payload.optString("email", ""),
-                    latitude = payload.optDouble("latitude", 0.0),
-                    longitude = payload.optDouble("longitude", 0.0),
+                    latitude = latitude,
+                    longitude = longitude,
                     rotation = payload.optDouble("rotation", 0.0),
                     batteryLevel = payload.optInt("batteryLevel", 0),
                     isCharging = payload.optBoolean("isCharging", false),
-                    internetStatus = payload.optString("internetStatus", "unknown"),
+                    internetStatus = payload.optString("internetStatus", "mobile"),
                     lastUpdateTimestamp = System.currentTimeMillis(),
                 )
 
@@ -199,19 +199,14 @@ class MapViewModel(
                 copy(otherUsers = otherUsers + (userId to userOnMap))
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("NIMONS_WS", "failed to parse presence", e)
         }
     }
 
     fun selectUser(userId: Int?) {
-        updateState {
-            copy(selectedUserId = userId)
-        }
+        updateState { copy(selectedUserId = userId) }
     }
 
-    /**
-     * Remove users who haven't updated their location in 5 seconds.
-     */
     fun removeOfflineUsers() {
         val now = System.currentTimeMillis()
         val offlineTimeout = 5000L
@@ -227,18 +222,14 @@ class MapViewModel(
     }
 
     fun updateSearchQuery(query: String) {
-        updateState {
-            copy(searchQuery = query)
-        }
+        updateState { copy(searchQuery = query) }
     }
 
     fun getFilteredUsers(): Map<Int, UserOnMap> {
         val query = uiState.value.searchQuery.trim()
         val currentUsers = uiState.value.otherUsers
 
-        if (query.isEmpty()) {
-            return currentUsers
-        }
+        if (query.isEmpty()) return currentUsers
 
         return currentUsers.filter { (_, user) ->
             user.fullName.contains(query, ignoreCase = true) ||

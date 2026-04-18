@@ -1,15 +1,14 @@
 package com.tit.nimonsapp.data.network
 
+import android.util.Log
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
@@ -20,7 +19,11 @@ class WebSocketManager(
     private val client: OkHttpClient,
 ) {
     private var webSocket: WebSocket? = null
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json =
+        Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
     private val _messages = Channel<WebSocketMessage>(Channel.UNLIMITED)
     val messages: Flow<WebSocketMessage> = _messages.receiveAsFlow()
 
@@ -30,6 +33,8 @@ class WebSocketManager(
         url: String,
         token: String? = null,
     ) {
+        Log.d("NIMONS_WS_RAW", "connect() called url=$url hasToken=${!token.isNullOrBlank()}")
+
         val requestBuilder = Request.Builder().url(url)
         token?.let {
             requestBuilder.addHeader("Authorization", "Bearer $it")
@@ -43,8 +48,9 @@ class WebSocketManager(
         object : WebSocketListener() {
             override fun onOpen(
                 ws: WebSocket,
-                response: okhttp3.Response,
+                response: Response,
             ) {
+                Log.d("NIMONS_WS_RAW", "onOpen code=${response.code}")
                 _messages.trySend(
                     WebSocketMessage(
                         type = WebSocketMessageType.CONNECTED,
@@ -58,8 +64,10 @@ class WebSocketManager(
                 ws: WebSocket,
                 text: String,
             ) {
+                Log.d("NIMONS_WS_RAW", "onMessage: $text")
+
                 try {
-                    val jsonObject = org.json.JSONObject(text)
+                    val jsonObject = JSONObject(text)
                     val type = jsonObject.optString("type", "")
 
                     when (type) {
@@ -75,6 +83,26 @@ class WebSocketManager(
 
                         "member_presence_updated" -> {
                             val payload = jsonObject.optJSONObject("payload")
+
+                            payload?.let {
+                                val userId = it.optInt("userId", -1)
+                                if (userId != -1) {
+                                    onlineUsers[userId] =
+                                        MemberPresencePayload(
+                                            userId = userId,
+                                            email = it.optString("email", ""),
+                                            fullName = it.optString("fullName", ""),
+                                            latitude = it.optDouble("latitude", 0.0),
+                                            longitude = it.optDouble("longitude", 0.0),
+                                            rotation = it.optDouble("rotation", 0.0),
+                                            batteryLevel = it.optInt("batteryLevel", 0),
+                                            isCharging = it.optBoolean("isCharging", false),
+                                            internetStatus = it.optString("internetStatus", "mobile"),
+                                            metadata = emptyMap(),
+                                        )
+                                }
+                            }
+
                             _messages.trySend(
                                 WebSocketMessage(
                                     type = WebSocketMessageType.MEMBER_PRESENCE_UPDATED,
@@ -83,8 +111,23 @@ class WebSocketManager(
                                 ),
                             )
                         }
+
+                        "error" -> {
+                            _messages.trySend(
+                                WebSocketMessage(
+                                    type = WebSocketMessageType.ERROR,
+                                    payload = jsonObject.optJSONObject("payload"),
+                                    errorMessage = jsonObject.optJSONObject("payload")?.optString("message"),
+                                ),
+                            )
+                        }
+
+                        else -> {
+                            Log.d("NIMONS_WS_RAW", "ignored message type=$type")
+                        }
                     }
                 } catch (e: Exception) {
+                    Log.e("NIMONS_WS_RAW", "onMessage parse failed", e)
                     _messages.trySend(
                         WebSocketMessage(
                             type = WebSocketMessageType.ERROR,
@@ -100,6 +143,7 @@ class WebSocketManager(
                 code: Int,
                 reason: String,
             ) {
+                Log.d("NIMONS_WS_RAW", "onClosing code=$code reason=$reason")
                 _messages.trySend(
                     WebSocketMessage(
                         type = WebSocketMessageType.DISCONNECTED,
@@ -109,11 +153,24 @@ class WebSocketManager(
                 )
             }
 
+            override fun onClosed(
+                ws: WebSocket,
+                code: Int,
+                reason: String,
+            ) {
+                Log.d("NIMONS_WS_RAW", "onClosed code=$code reason=$reason")
+            }
+
             override fun onFailure(
                 ws: WebSocket,
                 t: Throwable,
-                response: okhttp3.Response?,
+                response: Response?,
             ) {
+                Log.e(
+                    "NIMONS_WS_RAW",
+                    "onFailure code=${response?.code} message=${t.message}",
+                    t,
+                )
                 _messages.trySend(
                     WebSocketMessage(
                         type = WebSocketMessageType.ERROR,
@@ -130,10 +187,13 @@ class WebSocketManager(
                 payload = payload,
                 timestamp = Instant.now().toString(),
             )
-        webSocket?.send(json.encodeToString(updateDto))
+        val jsonText = json.encodeToString(updateDto)
+        Log.d("NIMONS_WS_RAW", "sendPresenceUpdate: $jsonText")
+        webSocket?.send(jsonText)
     }
 
     fun disconnect() {
+        Log.d("NIMONS_WS_RAW", "disconnect() called")
         webSocket?.close(1000, "Disconnected by user")
         webSocket = null
     }

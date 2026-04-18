@@ -27,7 +27,7 @@ class WebSocketRepository(
     val onlineUsers: StateFlow<Map<Int, UserLocation>> = _onlineUsers.asStateFlow()
 
     fun connect(token: String) {
-        val url = "https://mad.labpro.hmif.dev/ws/live"
+        val url = "wss://mad.labpro.hmif.dev/ws/live"
         manager.connect(url, token)
     }
 
@@ -36,13 +36,13 @@ class WebSocketRepository(
     fun sendMyLocation(location: UserLocation) {
         val payload =
             PresencePayload(
-                name = "", // TODO: Get from user profile
+                name = "",
                 latitude = location.latitude,
                 longitude = location.longitude,
                 rotation = location.rotation,
                 batteryLevel = location.batteryLevel,
                 isCharging = location.isCharging,
-                internetStatus = location.internetStatus,
+                internetStatus = if (location.internetStatus == "wifi") "wifi" else "mobile",
                 metadata = emptyMap(),
             )
         manager.sendPresenceUpdate(payload)
@@ -57,7 +57,7 @@ class WebSocketRepository(
                 rotation = payload.optDouble("rotation", 0.0),
                 batteryLevel = payload.optInt("batteryLevel", 0),
                 isCharging = payload.optBoolean("isCharging", false),
-                internetStatus = payload.optString("internetStatus", "unknown"),
+                internetStatus = if (payload.optString("internetStatus", "mobile") == "wifi") "wifi" else "mobile",
                 metadata = emptyMap(),
             )
         manager.sendPresenceUpdate(presencePayload)
