@@ -1,0 +1,593 @@
+openapi: 3.0.3
+info:
+    title: Nimons360 API
+    description: REST API contract for Nimons360 Android application (Tugas Besar MST 1 IF3210 MAD - 2026)
+    version: 1.0.0
+    license:
+        name: MIT
+        url: https://opensource.org/licenses/MIT
+
+servers:
+    - url: https://mad.labpro.hmif.dev
+      description: Production server
+
+components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
+    schemas:
+        User:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 12
+                nim:
+                    type: string
+                    example: "13522084"
+                email:
+                    type: string
+                    example: "13522084@std.stei.itb.ac.id"
+                fullName:
+                    type: string
+                    example: "Dhafin Fawwaz Ikramullah"
+                createdAt:
+                    type: string
+                    format: date-time
+                    example: "2026-03-15T10:00:00Z"
+                updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-03-15T10:00:00Z"
+
+        FamilyMember:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 12
+                fullName:
+                    type: string
+                    example: "Dhafin Fawwaz Ikramullah"
+                email:
+                    type: string
+                    example: "13522084@std.stei.itb.ac.id"
+                joinedAt:
+                    type: string
+                    format: date-time
+                    example: "2026-03-15T10:00:00Z"
+
+        FamilyMemberCensored:
+            type: object
+            properties:
+                fullName:
+                    type: string
+                    example: "D********* T*********"
+                email:
+                    type: string
+                    example: "********@std.stei.itb.ac.id"
+
+        FamilyBasic:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 41
+                name:
+                    type: string
+                    example: "IF3210 Squad"
+                iconUrl:
+                    type: string
+                    example: "https://mad.labpro.hmif.dev/assets/family_icon_1.png"
+
+        FamilyDetail:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 41
+                name:
+                    type: string
+                    example: "IF3210 Squad"
+                iconUrl:
+                    type: string
+                    example: "https://mad.labpro.hmif.dev/assets/family_icon_1.png"
+                isMember:
+                    type: boolean
+                familyCode:
+                    type: string
+                    description: Only present if isMember is true
+                    example: "ABC123"
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                members:
+                    type: array
+                    items:
+                        oneOf:
+                            - $ref: "#/components/schemas/FamilyMember"
+                            - $ref: "#/components/schemas/FamilyMemberCensored"
+
+        FamilyWithMembers:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 41
+                name:
+                    type: string
+                    example: "IF3210 Squad"
+                iconUrl:
+                    type: string
+                    example: "https://mad.labpro.hmif.dev/assets/family_icon_1.png"
+                familyCode:
+                    type: string
+                    example: "ABCDEF"
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                members:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/FamilyMember"
+
+        DiscoverFamily:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    example: 41
+                name:
+                    type: string
+                    example: "IF3210 Squad"
+                iconUrl:
+                    type: string
+                    example: "https://mad.labpro.hmif.dev/assets/family_icon_1.png"
+                createdAt:
+                    type: string
+                    format: date-time
+                members:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/FamilyMemberCensored"
+
+        ErrorResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                    example: "Unauthorized"
+
+paths:
+    /api/login:
+        post:
+            summary: Login
+            operationId: loginUser
+            description: Authenticate user with email and password, returns JWT token.
+            security: []
+            tags:
+                - Auth
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                                - password
+                            properties:
+                                email:
+                                    type: string
+                                    example: "13522084@std.stei.itb.ac.id"
+                                password:
+                                    type: string
+                                    example: "13522084"
+            responses:
+                "200":
+                    description: Login successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                                            expiresAt:
+                                                type: string
+                                                format: date-time
+                                                example: "2026-03-15T10:00:00Z"
+                                            user:
+                                                type: object
+                                                properties:
+                                                    id:
+                                                        type: integer
+                                                        example: 12
+                                                    nim:
+                                                        type: string
+                                                        example: "13522084"
+                                                    email:
+                                                        type: string
+                                                        example: "13522084@std.stei.itb.ac.id"
+                                                    fullName:
+                                                        type: string
+                                                        example: "Dhafin Fawwaz Ikramullah"
+                "401":
+                    description: Invalid credentials
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/me:
+        get:
+            summary: Get User Profile
+            operationId: getUserProfile
+            description: Retrieve the profile of the currently logged-in user.
+            tags:
+                - User
+            security:
+                - BearerAuth: []
+            responses:
+                "200":
+                    description: User profile retrieved successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                "401":
+                    description: Unauthorized - token expired or invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+        patch:
+            summary: Update User Profile
+            operationId: updateUserProfile
+            description: Update the full name of the currently logged-in user.
+            tags:
+                - User
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - fullName
+                            properties:
+                                fullName:
+                                    type: string
+                                    example: "Dhafin Fawwaz Ikramullah"
+            responses:
+                "200":
+                    description: Profile updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                "401":
+                    description: Unauthorized - token expired or invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/me/families:
+        get:
+            summary: Get My Families
+            operationId: getMyFamilies
+            description: Retrieve all families joined by the current user, including family code and member details.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            responses:
+                "200":
+                    description: List of user's families
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/FamilyWithMembers"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/families:
+        get:
+            summary: Get All Families
+            operationId: getAllFamilies
+            description: Retrieve all available families with basic information.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            responses:
+                "200":
+                    description: List of all families
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/FamilyBasic"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+        post:
+            summary: Create a New Family
+            operationId: createFamily
+            description: Create a new family with a name and icon. Only predefined icon URLs are accepted.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - name
+                                - iconUrl
+                            properties:
+                                name:
+                                    type: string
+                                    example: "Weekend Gang"
+                                iconUrl:
+                                    type: string
+                                    enum:
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_1.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_2.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_3.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_4.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_5.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_6.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_7.png"
+                                        - "https://mad.labpro.hmif.dev/assets/family_icon_8.png"
+                                    example: "https://mad.labpro.hmif.dev/assets/family_icon_1.png"
+            responses:
+                "201":
+                    description: Family created successfully. Creator is automatically joined.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/FamilyDetail"
+                "400":
+                    description: Bad request - invalid icon URL or missing fields
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/families/discover:
+        get:
+            summary: Discover Families
+            operationId: discoverFamilies
+            description: Retrieve 5 random families not yet joined by the current user. Member info is censored.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            responses:
+                "200":
+                    description: List of 5 random discoverable families
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        maxItems: 5
+                                        items:
+                                            $ref: "#/components/schemas/DiscoverFamily"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/families/join:
+        post:
+            summary: Join a Family
+            operationId: joinFamily
+            description: Join a family using its ID and family code.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - familyId
+                                - familyCode
+                            properties:
+                                familyId:
+                                    type: integer
+                                    example: 41
+                                familyCode:
+                                    type: string
+                                    minLength: 6
+                                    maxLength: 6
+                                    example: "ABC123"
+            responses:
+                "200":
+                    description: Successfully joined the family
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            joined:
+                                                type: boolean
+                                                example: true
+                "400":
+                    description: Invalid family code or already a member
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "404":
+                    description: Family not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/families/leave:
+        post:
+            summary: Leave a Family
+            operationId: leaveFamily
+            description: Leave a family that the current user is a member of.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - familyId
+                            properties:
+                                familyId:
+                                    type: integer
+                                    example: 41
+            responses:
+                "200":
+                    description: Successfully left the family
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: object
+                                        properties:
+                                            left:
+                                                type: boolean
+                                                example: true
+                "400":
+                    description: Not a member of the family
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "404":
+                    description: Family not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+
+    /api/families/{familyId}:
+        get:
+            summary: Get Family Detail
+            operationId: getFamilyDetail
+            description: >
+                Retrieve detail of a specific family including its members.
+                If the user is a member, full member info and family code are returned.
+                If not a member, member info is censored.
+            tags:
+                - Families
+            security:
+                - BearerAuth: []
+            parameters:
+                - name: familyId
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                  example: 41
+            responses:
+                "200":
+                    description: Family detail retrieved successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        $ref: "#/components/schemas/FamilyDetail"
+                "401":
+                    description: Unauthorized
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
+                "404":
+                    description: Family not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ErrorResponse"
