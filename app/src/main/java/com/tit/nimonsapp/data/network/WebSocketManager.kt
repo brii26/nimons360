@@ -1,9 +1,14 @@
 package com.tit.nimonsapp.data.network
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -29,10 +34,23 @@ class WebSocketManager(
 
     private val onlineUsers = ConcurrentHashMap<Int, MemberPresencePayload>()
 
+    private var reconnectAttempts = 0
+    private var reconnectDelay = 1000L
+    private var shouldReconnect = false
+    private var currentUrl: String? = null
+    private var currentToken: String? = null
+    private val connectScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     fun connect(
         url: String,
         token: String? = null,
     ) {
+        currentUrl = url
+        currentToken = token
+        shouldReconnect = true
+        reconnectAttempts = 0
+        reconnectDelay = 1000L
+
         Log.d("NIMONS_WS_RAW", "connect() called url=$url hasToken=${!token.isNullOrBlank()}")
 
         val requestBuilder = Request.Builder().url(url)
@@ -44,6 +62,25 @@ class WebSocketManager(
         webSocket = client.newWebSocket(request, createWebSocketListener())
     }
 
+    private fun attemptReconnect() {
+        if (!shouldReconnect || reconnectAttempts >= 5) {
+            Log.d("NIMONS_WS_RAW", "Reconnect stopped: attempts=$reconnectAttempts, shouldReconnect=$shouldReconnect")
+            return
+        }
+
+        Log.d("NIMONS_WS_RAW", "Attempting reconnect #$reconnectAttempts after ${reconnectDelay}ms")
+        connectScope.launch {
+            delay(reconnectDelay)
+            currentUrl?.let { url ->
+                currentToken?.let { token ->
+                    connect(url, token)
+                }
+            }
+            reconnectAttempts++
+            reconnectDelay = (reconnectDelay * 2).coerceAtMost(30000L) // Max 30 seconds
+        }
+    }
+
     private fun createWebSocketListener(): WebSocketListener =
         object : WebSocketListener() {
             override fun onOpen(
@@ -51,6 +88,8 @@ class WebSocketManager(
                 response: Response,
             ) {
                 Log.d("NIMONS_WS_RAW", "onOpen code=${response.code}")
+                reconnectAttempts = 0
+                reconnectDelay = 1000L
                 _messages.trySend(
                     WebSocketMessage(
                         type = WebSocketMessageType.CONNECTED,
@@ -178,6 +217,7 @@ class WebSocketManager(
                         errorMessage = t.message,
                     ),
                 )
+                attemptReconnect()
             }
         }
 
@@ -194,6 +234,8 @@ class WebSocketManager(
 
     fun disconnect() {
         Log.d("NIMONS_WS_RAW", "disconnect() called")
+        shouldReconnect = false
+        reconnectAttempts = 0
         webSocket?.close(1000, "Disconnected by user")
         webSocket = null
     }
