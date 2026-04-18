@@ -57,15 +57,31 @@ class FamilyDetailViewModel(
     ) {
         val familyId = currentFamilyId ?: uiState.value.familyDetail?.id ?: return
 
-        if (familyCode.isBlank()) {
+        val normalizedCode = familyCode.trim().uppercase()
+
+        if (normalizedCode.isBlank()) {
             updateState {
                 copy(meta = meta.copy(errorMessage = "Family code must not be empty"))
             }
             return
         }
 
+        if (normalizedCode.length != 6) {
+            updateState {
+                copy(meta = meta.copy(errorMessage = "Family code must be exactly 6 characters"))
+            }
+            return
+        }
+
+        if (!normalizedCode.all { it.isLetterOrDigit() }) {
+            updateState {
+                copy(meta = meta.copy(errorMessage = "Family code must contain only letters and numbers"))
+            }
+            return
+        }
+
         executeAuthenticatedAction(
-            errorMessageFallback = "Wrong Family Code!",
+            errorMessageFallback = "Failed to join the family!",
             onStart = {
                 copy(
                     isSubmittingAction = true,
@@ -74,12 +90,14 @@ class FamilyDetailViewModel(
             },
             action = { token ->
                 try {
-                    familyRepository.joinFamily(token, familyId, familyCode.trim())
+                    familyRepository.joinFamily(token, familyId, normalizedCode)
                 } catch (e: HttpException) {
-                    if (e.code() == 403) {
-                        throw Exception("Wrong Family Code!")
+                    when (e.code()) {
+                        403 -> throw Exception("Wrong family code!")
+                        400 -> throw Exception("Wrong family code!")
+                        401, 409 -> throw Exception("Session has ended, please log in again.")
+                        else -> throw e
                     }
-                    throw e
                 }
             },
             onSuccess = {

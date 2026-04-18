@@ -90,10 +90,12 @@ class FamiliesViewModel(
             }
         val pinnedSet = pinnedFamilyIds.toSet()
 
+        val sanitizedQuery = sanitizeSearchQuery(searchQuery)
+
         val filtered =
             allFamilies
                 .filter { family ->
-                    (searchQuery.isEmpty() || family.name.contains(searchQuery, ignoreCase = true)) &&
+                    (sanitizedQuery.isEmpty() || family.name.contains(sanitizedQuery, ignoreCase = true)) &&
                         (myIds == null || family.id in myIds)
                 }.map { FamilyItem(it, it.id in pinnedSet) }
 
@@ -101,5 +103,15 @@ class FamiliesViewModel(
             allFilteredItems = filtered,
             displayedCount = if (resetPage) FAMILIES_PAGE_SIZE else displayedCount,
         )
+    }
+
+    private fun sanitizeSearchQuery(query: String): String {
+        // Escape regex special characters
+        val specialChars = listOf("*", "+", "?", "[", "]", "{", "}", "(", ")")
+        var result = query
+        for (char in specialChars) {
+            result = result.replace(char, "\\$char")
+        }
+        return result
     }
 }

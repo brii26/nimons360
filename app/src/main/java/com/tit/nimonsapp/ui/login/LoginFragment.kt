@@ -78,6 +78,7 @@ class LoginFragment : Fragment() {
                     count: Int,
                 ) {
                     viewModel.onPasswordChanged(s?.toString().orEmpty())
+                    viewModel.clearCountdown()
                 }
 
                 override fun afterTextChanged(s: Editable?) = Unit

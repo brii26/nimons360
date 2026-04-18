@@ -174,6 +174,7 @@ class MapViewModel(
             Log.d("NIMONS_WS", "presence received userId=$userId payload=$payload")
             if (userId == -1) return
 
+            if (userId !in uiState.value.myFamilyMemberIds) {
             val latitude = payload.optDouble("latitude", 0.0)
             val longitude = payload.optDouble("longitude", 0.0)
             if (latitude == 0.0 || longitude == 0.0) {

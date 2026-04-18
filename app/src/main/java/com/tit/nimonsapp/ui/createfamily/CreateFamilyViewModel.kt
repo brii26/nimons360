@@ -46,9 +46,23 @@ class CreateFamilyViewModel(
         val name = uiState.value.name.trim()
         val iconUrl = uiState.value.iconUrl.trim()
 
-        if (name.isBlank() || iconUrl.isBlank()) {
+        if (name.isBlank()) {
             updateState {
-                withMeta(meta.copy(errorMessage = "Name and icon URL must not be empty"))
+                withMeta(meta.copy(errorMessage = "Family name must not be empty"))
+            }
+            return
+        }
+
+        if (name.length > 40) {
+            updateState {
+                withMeta(meta.copy(errorMessage = "Family name must be 40 characters or less"))
+            }
+            return
+        }
+
+        if (iconUrl.isBlank()) {
+            updateState {
+                withMeta(meta.copy(errorMessage = "Please select an icon"))
             }
             return
         }
