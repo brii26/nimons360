@@ -14,6 +14,8 @@ class LoginViewModel(
     private val authRepository = AuthRepository()
     private val sessionRepository = SessionRepository(application)
 
+    private val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
+
     override fun LoginUiState.withMeta(meta: UiResourceMeta): LoginUiState = copy(meta = meta)
 
     fun onEmailChanged(email: String) {
@@ -37,6 +39,12 @@ class LoginViewModel(
                 withMeta(meta.copy(errorMessage = "Email is required"))
             }
             return
+        }
+
+        if (!emailRegex.matches(email)) {
+            updateState {
+                withMeta(meta.copy(errorMessage = "Invalid email format"))
+            }
         }
 
         if (password.isBlank()) {

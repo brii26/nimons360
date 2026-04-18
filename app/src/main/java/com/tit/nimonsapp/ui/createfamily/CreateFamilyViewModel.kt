@@ -14,6 +14,20 @@ class CreateFamilyViewModel(
     private val familyRepository = FamilyRepository()
     private val sessionRepository = SessionRepository(application)
 
+    // ONLY ALLOWED ICONS
+    companion object {
+        private val ALLOWED_ICON_URLS = listOf(
+            "https://mad.labpro.hmif.dev/assets/family_icon_1.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_2.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_3.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_4.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_5.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_6.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_7.png",
+            "https://mad.labpro.hmif.dev/assets/family_icon_8.png",
+        )
+    }
+
     override fun CreateFamilyUiState.withMeta(meta: UiResourceMeta): CreateFamilyUiState = copy(meta = meta)
 
     fun onNameChanged(name: String) {
@@ -35,6 +49,13 @@ class CreateFamilyViewModel(
         if (name.isBlank() || iconUrl.isBlank()) {
             updateState {
                 withMeta(meta.copy(errorMessage = "Name and icon URL must not be empty"))
+            }
+            return
+        }
+
+        if (iconUrl !in ALLOWED_ICON_URLS) {
+            updateState {
+                withMeta(meta.copy(errorMessage = "Invalid icon URL"))
             }
             return
         }
