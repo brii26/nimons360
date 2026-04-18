@@ -3,6 +3,7 @@ package com.tit.nimonsapp.ui.map
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +14,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -23,6 +26,7 @@ import com.tit.nimonsapp.MainActivity
 import com.tit.nimonsapp.R
 import com.tit.nimonsapp.data.repository.DeviceLocation
 import com.tit.nimonsapp.data.repository.LocationRepository
+import com.tit.nimonsapp.ui.common.AvatarView
 import com.tit.nimonsapp.ui.common.UserInfoBottomSheet
 import com.tit.nimonsapp.ui.map.components.MapMarkerView
 import kotlinx.coroutines.Job
@@ -54,6 +58,15 @@ class MapFragment :
 
     private var userInfoBottomSheet: UserInfoBottomSheet? = null
     private lateinit var mapSearchEditText: EditText
+
+    private lateinit var cardAvatar: AvatarView
+    private lateinit var cardName: TextView
+    private lateinit var cardEmail: TextView
+    private lateinit var cardBattery: TextView
+    private lateinit var cardCharging: ImageView
+    private lateinit var cardLocation: TextView
+    private lateinit var cardWifi: TextView
+    private lateinit var cardWifiIcon: ImageView
 
     private var locationCollectionJob: Job? = null
     private var offlineCleanupJob: Job? = null
@@ -113,6 +126,16 @@ class MapFragment :
 
         val factory = MapViewModelFactory(requireActivity().application, MainActivity.webSocketRepository)
         viewModel = ViewModelProvider(this, factory)[MapViewModel::class.java]
+
+        val cardView = view.findViewById<View>(R.id.map_user_card)
+        cardAvatar = cardView.findViewById(R.id.map_card_avatar)
+        cardName = cardView.findViewById(R.id.map_card_name)
+        cardEmail = cardView.findViewById(R.id.map_card_email)
+        cardBattery = cardView.findViewById(R.id.map_card_battery)
+        cardCharging = cardView.findViewById(R.id.map_card_charging)
+        cardLocation = cardView.findViewById(R.id.map_card_location)
+        cardWifi = cardView.findViewById(R.id.map_card_wifi)
+        cardWifiIcon = cardView.findViewById(R.id.map_card_wifi_icon)
 
         observeViewModel()
         setupSearchBar()
@@ -242,6 +265,7 @@ class MapFragment :
                 state.meta.errorMessage?.let { message ->
                     showSnackbar(message)
                 }
+                bindUserCard(state)
             }
         }
 
@@ -328,6 +352,41 @@ class MapFragment :
                 }
             }
         }
+    }
+
+    private fun bindUserCard(state: MapUiState) {
+        val profile = state.currentUserProfile
+        val location = state.currentLocation
+
+        val name = profile?.fullName ?: ""
+        val email = profile?.email ?: ""
+
+        cardAvatar.setLetter(
+            name.take(1).uppercase().ifBlank { "?" },
+            ContextCompat.getColor(requireContext(), R.color.profile_avatar_blue),
+        )
+        cardName.text = if (name.length > 30) name.take(30) + "…" else name
+        cardEmail.text = if (email.length > 35) email.take(35) + "…" else email
+
+        cardBattery.text = "${location.batteryLevel}%"
+        cardCharging.visibility = if (location.isCharging) View.VISIBLE else View.GONE
+
+        val lat = location.latitude
+        val lng = location.longitude
+        cardLocation.text = if (lat == 0.0 && lng == 0.0) "—" else String.format("%.3f,\n%.3f", lat, lng)
+
+        cardWifi.text = when (location.internetStatus) {
+            "wifi" -> "WiFi"
+            "mobile" -> "Mobile"
+            else -> "—"
+        }
+        cardWifiIcon.setColorFilter(
+            when (location.internetStatus) {
+                "wifi" -> ContextCompat.getColor(requireContext(), R.color.nimons_green)
+                "mobile" -> Color.parseColor("#FF9800")
+                else -> ContextCompat.getColor(requireContext(), R.color.section_label)
+            },
+        )
     }
 
     private fun getMarkerColor(userId: Int): Int {
